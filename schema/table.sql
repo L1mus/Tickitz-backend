@@ -71,9 +71,11 @@ CREATE TABLE cinemas (
 );
 
 CREATE TABLE seats (
+    id SERIAL PRIMARY KEY,
     cinema_id INTEGER,
     seat_number INTEGER NOT NULL,
     row VARCHAR(10) NOT NULL,
+    seat_type type_seat DEFAULT 'regular',
     CONSTRAINT fk_seats_cinema FOREIGN KEY (cinema_id) REFERENCES cinemas(id)
 );
 
@@ -144,5 +146,6 @@ CREATE TABLE booking_seats (
     showtime_id INTEGER,
     CONSTRAINT fk_bs_booking FOREIGN KEY (booking_id) REFERENCES bookings(id),
     CONSTRAINT fk_bs_seat FOREIGN KEY (seat_id) REFERENCES seats(id),
-    CONSTRAINT fk_bs_showtime FOREIGN KEY (showtime_id) REFERENCES showtimes(id)
+    CONSTRAINT fk_bs_showtime FOREIGN KEY (showtime_id) REFERENCES showtimes(id),
+    CONSTRAINT unique_booked_seat UNIQUE (seat_id, showtime_id)
 );
