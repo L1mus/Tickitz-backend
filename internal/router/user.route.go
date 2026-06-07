@@ -10,7 +10,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func UserRouter(router *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
+func UserRouter(router *gin.RouterGroup, db *pgxpool.Pool, rdb *redis.Client) {
 	userRouter := router.Group("/users")
 	userRouter.Use(middleware.VerifyToken, middleware.CheckBlacklist(rdb))
 	userRepository := repository.NewUserRepository(db)

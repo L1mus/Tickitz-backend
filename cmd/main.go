@@ -6,8 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	// _ "github.com/L1mus/backend-ewallet/docs"
+	_ "github.com/L1mus/Tickitz-backend/docs"
 	"github.com/L1mus/Tickitz-backend/internal/config"
+	"github.com/L1mus/Tickitz-backend/internal/middleware"
 	"github.com/L1mus/Tickitz-backend/internal/router"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -23,8 +24,8 @@ import (
 
 // @license.name  MIT
 
-// @host      localhost:80/api
-// @BasePath  /
+// @host      localhost:8080
+// @BasePath  /api
 
 // @securityDefinitions.apiKey  ApiKeyAuth
 // @in header
@@ -40,6 +41,7 @@ func main() {
 	// inisialisasi
 	// gin.New()
 	app := gin.Default()
+	app.Use(middleware.CORSMiddleware)
 	// connect ke db
 	db, err := config.ConnectPsql()
 	if err != nil {

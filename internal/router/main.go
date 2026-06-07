@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	_ "github.com/L1mus/Tickitz-backend/docs"
 	"github.com/L1mus/Tickitz-backend/internal/dto"
 	"github.com/L1mus/Tickitz-backend/internal/middleware"
 	"github.com/gin-gonic/gin"
@@ -19,7 +20,10 @@ func InitRouter(router *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// router.METHOD(endpoint, callback)
 	router.Static("/img", "public/img")
-	UserRouter(router, db, rdb)
+
+	routeApi := router.Group("/api")
+	// UserRouter(route, db, rdb)
+	AuthRouter(routeApi, db, rdb)
 
 	//fallback
 	router.NoRoute(func(ctx *gin.Context) {

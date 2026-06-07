@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"net/http"
-	"os"
 	"slices"
 	"strings"
 
@@ -11,8 +10,9 @@ import (
 
 func CORSMiddleware(ctx *gin.Context) {
 	origin := ctx.GetHeader("Origin")
+	AllowOrigins := []string{"http://localhost:5173", "http://localhost:3000", "http://localhost:9000", "http://localhost:80", "http://localhost:8080", "http://192.168.50.61:200"}
 
-	AllowOrigins := []string{os.Getenv("ALLOWED_ORIGINS")}
+	// AllowOrigins := []string{allowedOrigin[]}
 	AllowHeaders := []string{"Origin", "Content-Type", "Authorization"}
 	AllowMethods := []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete, http.MethodOptions}
 
