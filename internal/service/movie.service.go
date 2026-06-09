@@ -100,3 +100,35 @@ func (s *MovieService) GetShowtimeFilter(ctx context.Context, movieID int, date 
 		Locations: locationDTOs,
 	}, nil
 }
+
+func (s *MovieService) GetMovies(ctx context.Context) ([]dto.MovieResponse, error) {
+	movies, err := s.movieRepo.GetAllMovies(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var response []dto.MovieResponse
+
+	for _, m := range movies {
+
+		var genreDTOs []dto.GenreDTO
+		for _, g := range m.Genre {
+			genreDTOs = append(genreDTOs, dto.GenreDTO{
+				ID:    g.ID,
+				Genre: g.Genre,
+			})
+		}
+
+		res := dto.MovieResponse{
+			Id:          m.Id,
+			Title:       m.Title,
+			Genres:      genreDTOs,
+			Poster:      m.Poster,
+			ReleaseDate: m.ReleaseDate,
+		}
+
+		response = append(response, res)
+	}
+
+	return response, nil
+}
