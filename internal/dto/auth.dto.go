@@ -7,8 +7,9 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	Message string `json:"message"`
-	Email   string `json:"email"`
+	Message   string `json:"message"`
+	Email     string `json:"email"`
+	Is_Active bool   `json:"is_active"`
 }
 
 type ActivationRequest struct {
