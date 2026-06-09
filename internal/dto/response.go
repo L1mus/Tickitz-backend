@@ -10,6 +10,17 @@ type CastDTO struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
+
+type ResponseSuccess struct {
+	Status  string `json:"status" example:"success"`
+	Message string `json:"message" example:"Welcome, John doe"`
+}
+
+type ResponseError struct {
+	Status  string `json:"status" example:"error"`
+	Message string `json:"message" example:"Failed get data/internal server error"`
+	Error   string `json:"error" example:"internal server error/bad request"`
+}
 type ShowtimeItemDTO struct {
 	ShowtimeID  int       `json:"showtime_id"`
 	CinemaID    int       `json:"cinema_id"`
@@ -35,13 +46,9 @@ type MovieDetailResponse struct {
 	Genres      []GenreDTO `json:"genres"`
 	Casts       []CastDTO  `json:"casts"`
 }
-type ShowtimeFilterRequest struct {
-	Date     time.Time `json:"date"`
-	City     string    `json:"city"`
-	ShowTime *string   `json:"show_time,omitempty"`
-}
+
 type ShowtimeFilterResponse struct {
-	Showtimes []ShowtimeItemDTO `json:"showtimes"`
+	Showtime  []ShowtimeItemDTO `json:"showtime"`
 	Locations []LocationDTO     `json:"locations"`
 }
 type SeatDTO struct {
@@ -51,7 +58,8 @@ type SeatDTO struct {
 	SeatType   string `json:"seat_type"`
 	SeatStatus string `json:"seat_status" binding:"required,oneof=available sold"`
 }
-type SeatPageResponse struct {
+
+type SummaryMovieDTO struct {
 	MovieTitle  string    `json:"movie_title"`
 	MoviePoster string    `json:"movie_poster"`
 	Category    string    `json:"category"`
@@ -60,13 +68,12 @@ type SeatPageResponse struct {
 	ShowDate    time.Time `json:"show_date"`
 	ShowTime    string    `json:"show_time"`
 	TicketPrice int       `json:"ticket_price"`
-	Seats       []SeatDTO `json:"seats"`
 }
-type CreateBookingRequest struct {
-	ShowtimeID int   `json:"showtime_id" binding:"required"`
-	SeatIDs    []int `json:"seat_ids"    binding:"required,min=1"`
-	Quantity   int   `json:"quantity"    binding:"required,min=1"`
+type SeatPageResponse struct {
+	Summary SummaryMovieDTO `json:"summary"`
+	Seats   []SeatDTO       `json:"seats"`
 }
+
 type CreateBookingResponse struct {
 	BookingID int `json:"booking_id"`
 }
@@ -89,9 +96,7 @@ type PaymentPageResponse struct {
 	Phone          string             `json:"phone"`
 	PaymentMethods []PaymentMethodDTO `json:"payment_methods"`
 }
-type SubmitPaymentRequest struct {
-	PaymentMethodID int `json:"payment_method_id" binding:"required"`
-}
+
 type TransactionModalResponse struct {
 	TransactionID   int       `json:"transaction_id"`
 	VirtualRek      int64     `json:"virtual_rek"`

@@ -21,10 +21,3 @@ type ShowtimeSummary struct {
 	ShowTime    string
 	TicketPrice int
 }
-
-type BookingRequest struct {
-	UserID     int
-	ShowtimeID int
-	SeatIDs    []int
-	Quantity   int
-}

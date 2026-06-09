@@ -27,6 +27,7 @@ func InitRouter(router *gin.Engine, db *pgxpool.Pool, rdb *redis.Client, mailer 
 	UserRouter(routeApi, db, rdb)
 	MovieRouter(router, db, rdb)
 	AuthRouter(routeApi, db, rdb, mailer)
+	OrderRouter(routeApi, db, rdb)
 
 	//fallback
 	router.NoRoute(func(ctx *gin.Context) {

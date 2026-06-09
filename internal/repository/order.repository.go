@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/L1mus/Tickitz-backend/internal/dto"
 	"github.com/L1mus/Tickitz-backend/internal/model"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -20,7 +21,7 @@ func NewOrderRepository() *OrderRepository {
 	return &OrderRepository{}
 }
 
-func (r *OrderRepository) GetShowtimeSummary(ctx context.Context, dbtx OrderDBTX, showtimeID int) (*model.ShowtimeSummary, error) {
+func (r *OrderRepository) GetShowtimeSummary(ctx context.Context, tx OrderDBTX, showtimeID int) (*model.ShowtimeSummary, error) {
 	const q = `
 		SELECT m.title AS movie_title, COALESCE(m.poster, '') AS movie_poster, COALESCE(m.category, '') AS category, c.id AS cinema_id, c.name AS cinema_name, COALESCE(c.logo, '') AS cinema_logo, st.date AS show_date, CAST(st.time AS TEXT) AS show_time, st.price AS ticket_price
 		FROM showtimes st
@@ -29,14 +30,14 @@ func (r *OrderRepository) GetShowtimeSummary(ctx context.Context, dbtx OrderDBTX
 		WHERE st.id = $1`
 
 	var data model.ShowtimeSummary
-	err := dbtx.QueryRow(ctx, q, showtimeID).Scan(&data.MovieTitle, &data.MoviePoster, &data.Category, &data.CinemaID, &data.CinemaName, &data.CinemaLogo, &data.ShowDate, &data.ShowTime, &data.TicketPrice)
+	err := tx.QueryRow(ctx, q, showtimeID).Scan(&data.MovieTitle, &data.MoviePoster, &data.Category, &data.CinemaID, &data.CinemaName, &data.CinemaLogo, &data.ShowDate, &data.ShowTime, &data.TicketPrice)
 	if err != nil {
 		return nil, err
 	}
 	return &data, nil
 }
 
-func (r *OrderRepository) GetSeatsByShowtime(ctx context.Context, dbtx OrderDBTX, showtimeID, cinemaID int) ([]model.SeatRow, error) {
+func (r *OrderRepository) GetSeatsByShowtime(ctx context.Context, tx OrderDBTX, showtimeID, cinemaID int) ([]model.SeatRow, error) {
 	const q = `
 		SELECT s.id AS seat_id, s.row, s.seat_number,
 			CAST(s.seat_type AS TEXT) AS seat_type,
@@ -51,7 +52,7 @@ func (r *OrderRepository) GetSeatsByShowtime(ctx context.Context, dbtx OrderDBTX
 		WHERE s.cinema_id = $2
 		ORDER BY s.row ASC, s.seat_number ASC`
 
-	rows, err := dbtx.Query(ctx, q, showtimeID, cinemaID)
+	rows, err := tx.Query(ctx, q, showtimeID, cinemaID)
 	if err != nil {
 		return nil, err
 	}
@@ -68,29 +69,29 @@ func (r *OrderRepository) GetSeatsByShowtime(ctx context.Context, dbtx OrderDBTX
 	return seats, rows.Err()
 }
 
-func (r *OrderRepository) CreateBooking(ctx context.Context, dbtx OrderDBTX, req model.BookingRequest) (int, error) {
+func (r *OrderRepository) CreateBooking(ctx context.Context, tx OrderDBTX, req dto.CreateBookingRequest, userID int) (int, error) {
 	const q = `
 		INSERT INTO bookings
 			(user_id, showtime_id, status_ticket, status_paid, quantity)
 		VALUES
-			($1, $2, 'active', 'not_paid', $3)
+			($1, $2, 'active', 'not_paid', $3)	
 		RETURNING id`
 
 	var bookingID int
-	err := dbtx.QueryRow(ctx, q, req.UserID, req.ShowtimeID, req.Quantity).Scan(&bookingID)
+	err := tx.QueryRow(ctx, q, userID, req.ShowtimeID, req.Quantity).Scan(&bookingID)
 	if err != nil {
 		return 0, err
 	}
 	return bookingID, nil
 }
 
-func (r *OrderRepository) CreateBookingSeat(ctx context.Context, dbtx OrderDBTX, bookingID, seatID, showtimeID int) error {
+func (r *OrderRepository) CreateBookingSeat(ctx context.Context, tx OrderDBTX, bookingID, seatID, showtimeID int) error {
 	const q = `
 		INSERT INTO booking_seats
 			(booking_id, seat_id, showtime_id)
 		VALUES
 			($1, $2, $3)`
 
-	_, err := dbtx.Exec(ctx, q, bookingID, seatID, showtimeID)
+	_, err := tx.Exec(ctx, q, bookingID, seatID, showtimeID)
 	return err
 }

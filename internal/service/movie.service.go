@@ -96,7 +96,7 @@ func (s *MovieService) GetShowtimeFilter(ctx context.Context, movieID int, date 
 	}
 
 	return dto.ShowtimeFilterResponse{
-		Showtimes: showtimeDTOs,
+		Showtime:  showtimeDTOs,
 		Locations: locationDTOs,
 	}, nil
 }
