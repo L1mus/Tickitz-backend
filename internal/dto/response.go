@@ -117,3 +117,11 @@ type UserProfileResponse struct {
 	Email     string `json:"email"`
 	Phone     string `json:"phone"`
 }
+
+type MovieResponse struct {
+	Id          int        `json:"id"`
+	Title       string     `json:"title"`
+	Poster      string     `json:"poster"`
+	Genres      []GenreDTO `json:"genres"`
+	ReleaseDate *time.Time `json:"release_date"`
+}
