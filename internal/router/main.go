@@ -24,6 +24,7 @@ func InitRouter(router *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 	routeApi := router.Group("/api")
 	UserRouter(routeApi, db, rdb)
 	AuthRouter(routeApi, db, rdb)
+	MovieRouter(router, db, rdb)
 
 	//fallback
 	router.NoRoute(func(ctx *gin.Context) {

@@ -12,4 +12,7 @@ var (
 	ErrOTPExpired          = errors.New("otp expired or not found")
 	ErrInvalidCredentials  = errors.New("invalid email or password")
 	ErrCredentialsRequired = errors.New("email and password are required")
+	MovieNotFound          = errors.New("Movie Not Found")
+	MovieGenresNotFound    = errors.New("Genre Not Found")
+	MovieCastsNotFound     = errors.New("Cast Not Found")
 )

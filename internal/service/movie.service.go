@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	apperror "github.com/L1mus/Tickitz-backend/internal/appError"
 	"github.com/L1mus/Tickitz-backend/internal/dto"
 	"github.com/L1mus/Tickitz-backend/internal/repository"
 )
@@ -19,17 +20,17 @@ func NewMovieService(movieRepo *repository.MovieRepository) *MovieService {
 func (s *MovieService) GetMovieDetail(ctx context.Context, movieID int) (dto.MovieDetailResponse, error) {
 	movie, err := s.movieRepo.GetMovieDetail(ctx, movieID)
 	if err != nil {
-		return dto.MovieDetailResponse{}, err
+		return dto.MovieDetailResponse{}, apperror.MovieNotFound
 	}
 
 	genres, err := s.movieRepo.GetMovieGenres(ctx, movieID)
 	if err != nil {
-		return dto.MovieDetailResponse{}, err
+		return dto.MovieDetailResponse{}, apperror.MovieGenresNotFound
 	}
 
 	casts, err := s.movieRepo.GetMovieCasts(ctx, movieID)
 	if err != nil {
-		return dto.MovieDetailResponse{}, err
+		return dto.MovieDetailResponse{}, apperror.MovieCastsNotFound
 	}
 
 	genreDTOs := make([]dto.GenreDTO, 0, len(genres))
@@ -62,8 +63,7 @@ func (s *MovieService) GetMovieDetail(ctx context.Context, movieID int) (dto.Mov
 	}, nil
 }
 
-func (s *MovieService) GetShowtimeFilter(ctx context.Context, movieID int, date time.Time, city string, showTime *string,
-) (dto.ShowtimeFilterResponse, error) {
+func (s *MovieService) GetShowtimeFilter(ctx context.Context, movieID int, date time.Time, city string, showTime *string) (dto.ShowtimeFilterResponse, error) {
 	showtimes, err := s.movieRepo.GetShowtimesByFilter(ctx, movieID, date, city, showTime)
 	if err != nil {
 		return dto.ShowtimeFilterResponse{}, err
