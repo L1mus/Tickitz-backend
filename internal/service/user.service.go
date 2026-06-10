@@ -112,3 +112,103 @@ func (s *UserService) UpdateProfile(ctx context.Context, userID int, req dto.Use
 		Photo:     user.Photo,
 	}, nil
 }
+
+func (s *UserService) GetOrderHistory(ctx context.Context, userID int) ([]dto.OrderHistoryRes, error) {
+	dbHistory, err := s.userRepository.GetOrderHistoryById(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var responseList []dto.OrderHistoryRes
+
+	for _, item := range dbHistory {
+		formatDate := item.Showtime.Date.Format("Tuesday, 07 July 2020")
+
+		formatTime := item.Showtime.Time
+		parsedTime, err := time.Parse("16:30:00", item.Showtime.Time)
+		if err == nil {
+			formatTime = strings.ToLower(parsedTime.Format("04:30pm"))
+		}
+
+		fullShowtime := fmt.Sprintf("%s - %s", formatDate, formatTime)
+
+		ticketStatus := "Ticket used"
+		if item.Booking.StatusTicket == "active" {
+			ticketStatus = "Ticket in active"
+		}
+
+		paymentStatus := "Not Paid"
+		if item.Booking.StatusPaid == "paid" {
+			paymentStatus = "Paid"
+		}
+
+		responseList = append(responseList, dto.OrderHistoryRes{
+			BookingId:    item.Booking.Id,
+			MovieTitle:   item.Movie.Title,
+			CinemaName:   item.Cinema.Name,
+			CinemaLogo:   item.Cinema.Logo,
+			Showtime:     fullShowtime,
+			StatusTicket: ticketStatus,
+			StatusPaid:   paymentStatus,
+		})
+
+	}
+	return responseList, nil
+}
+
+func (s *UserService) GetInformationDetail(ctx context.Context, bookingID, userID int) (*dto.DetailInformationRes, error) {
+	raw, err := s.userRepository.GetDetailById(ctx, bookingID, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	ticketStatus := "Ticket used"
+	if raw.StatusTicket == "active" {
+		ticketStatus = "Ticket in active"
+	}
+
+	paymentStatus := "Ticked used"
+	if raw.StatusPaid == "paid" {
+		paymentStatus = "Paid"
+	}
+
+	res := dto.DetailInformationRes{
+		BookingId:    raw.BookingId,
+		StatusTicket: ticketStatus,
+		StatusPaid:   paymentStatus,
+	}
+
+	if raw.TotalPrice != nil {
+		res.TotalPrice = *raw.TotalPrice
+	}
+
+	if raw.StatusPaid != "paid" {
+		if raw.VirtualRek != nil {
+			res.VirtualRek = *raw.VirtualRek
+		}
+
+		dueDate := raw.CreatedAt.Add(24 * time.Hour)
+		res.DueDateMessage = fmt.Sprintf("Pay this payment bill before it is due, on %s. If the bill has not been paid by the specified time, it will be forfeited", dueDate.Format("January 02, 2006"))
+	} else {
+		if raw.QrCode != nil {
+			res.QrCode = *raw.QrCode
+		}
+		res.Category = raw.Category
+		res.MovieTitle = raw.MovieTitle
+		res.Quantity = raw.Quantity
+		res.ShowtimeDate = raw.ShowtimeDate.Format("02 Jan")
+
+		t, err := time.Parse("15:04:00", raw.ShowtimeTime)
+		if err == nil {
+			res.ShowtimeTime = strings.ToLower(t.Format("03:04pm"))
+		}
+
+		if raw.SeatList != nil && *raw.SeatList != "" {
+			res.Seats = strings.Split(*raw.SeatList, ",")
+		} else {
+			res.Seats = []string{}
+		}
+	}
+
+	return &res, nil
+}

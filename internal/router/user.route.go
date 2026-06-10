@@ -19,4 +19,6 @@ func UserRouter(router *gin.RouterGroup, db *pgxpool.Pool, rdb *redis.Client) {
 
 	userRouter.GET("/profile", userController.GetUserProfile)
 	userRouter.PATCH("/profile", userController.UpdateProfile)
+	userRouter.GET("/history", userController.OrderHistory)
+	userRouter.GET("/history/:id/detail", userController.DetailInformation)
 }

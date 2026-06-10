@@ -70,3 +70,86 @@ func (r *UserRepository) UpdateProfileById(ctx context.Context, userID int, firs
 	}
 	return user, nil
 }
+
+func (r *UserRepository) GetOrderHistoryById(ctx context.Context, userID int) ([]*model.OrderHistoryDetail, error) {
+	const q = `
+		SELECT
+			b.id, b.user_id, b.showtime_id, b.status_ticket, b.status_paid, b.created_at,
+			COALESCE(m.title, '') AS movie_title,
+			COALESCE(c.name, '') AS cinema_name,
+			COALESCE(c.logo, '') AS cinema_logo,
+			s.date AS showtime_date,
+			COALESCE(s.time::text, '') AS showtime_time
+		FROM bookings b
+		INNER JOIN showtimes s ON b.showtime_id = s.id
+		INNER JOIN movies m ON s.movie_id = m.id
+		INNER JOIN cinemas c ON s.cinema_id = c.id
+		WHERE b.user_id = $1
+		ORDER BY b.created_at DESC;
+	`
+
+	rows, err := r.db.Query(ctx, q, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var history []*model.OrderHistoryDetail
+
+	for rows.Next() {
+		var detail model.OrderHistoryDetail
+
+		err := rows.Scan(
+			&detail.Booking.Id,
+			&detail.Booking.UserId,
+			&detail.Booking.ShowtimeId,
+			&detail.Booking.StatusTicket,
+			&detail.Booking.StatusPaid,
+			&detail.Booking.CreatedAt,
+			&detail.Movie.Title,
+			&detail.Cinema.Name,
+			&detail.Cinema.Logo,
+			&detail.Showtime.Date,
+			&detail.Showtime.Time,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		history = append(history, &detail)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return history, nil
+}
+
+func (r *UserRepository) GetDetailById(ctx context.Context, bookingID, userID int) (*model.InformationOrderDetail, error) {
+	q := `
+	SELECT
+		b.id, b.status_ticket, b.status_paid, b.quantity, b.created_at, t.virtual_rek, t.total_price, t.qr_code, m.title AS movie_title, m.category, s.date AS showtime_date, s.time::text AS showtime_time,
+		(
+			SELECT string_agg(se.row || se.seat_number::text, ',')
+			FROM booking_seats bs
+			INNER JOIN seats se ON bs.seat_id = se.id
+			WHERE bs.booking_id = b.id
+		) AS seat_list
+	FROM bookings b
+	INNER JOIN showtimes s ON b.showtime_id = s.id
+	INNER JOIN movies m ON s.movie_id = m.id
+	LEFT JOIN transactions t ON b.id = t.booking_id
+	WHERE b.id = $1 AND b.user_id = $2
+	`
+	row := r.db.QueryRow(ctx, q, bookingID, userID)
+
+	var raw model.InformationOrderDetail
+	err := row.Scan(
+		&raw.BookingId, &raw.StatusTicket, &raw.StatusPaid, &raw.Quantity, &raw.CreatedAt, &raw.VirtualRek, &raw.TotalPrice, &raw.QrCode, &raw.MovieTitle, &raw.Category, &raw.ShowtimeDate, &raw.ShowtimeTime, &raw.SeatList,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &raw, nil
+}
