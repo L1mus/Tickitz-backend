@@ -1,6 +1,8 @@
 package dto
 
-import "mime/multipart"
+import (
+	"mime/multipart"
+)
 
 type ProfileRequest struct {
 	FirstName *string `form:"firstname" json:"firstname"`
@@ -39,4 +41,14 @@ type UserUpdateProfileRes struct {
 	Email     string `json:"email"`
 	Phone     string `json:"phone"`
 	Photo     string `json:"photo"`
+}
+
+type OrderHistoryRes struct {
+	BookingId    int    `json:"booking_id"`
+	MovieTitle   string `json:"movie_title"`
+	CinemaName   string `json:"cinema_name"`
+	CinemaLogo   string `json:"cinema_logo"`
+	Showtime     string `json:"showtime"`
+	StatusTicket string `json:"status_ticket"`
+	StatusPaid   string `json:"status_paid"`
 }
