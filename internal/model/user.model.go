@@ -70,3 +70,6 @@ type OrderHistoryDetail struct {
 	Movie    Movie
 	Cinema   Cinema
 }
+
+type detail struct {
+}
