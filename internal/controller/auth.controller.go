@@ -126,7 +126,7 @@ func (c *AuthController) Register(ctx *gin.Context) {
 // @Failure      400 {object} dto.ResponseError "Invalid input or Invalid/expired OTP"
 // @Failure      404 {object} dto.ResponseError "User not found
 // @Failure      500 {object} dto.ResponseError "Internal server error"
-// @Router       /auth/activate [post]
+// @Router       /auth/register/activate [post]
 func (c *AuthController) Activate(ctx *gin.Context) {
 	var req dto.ActivationRequest
 	if err := ctx.ShouldBindWith(&req, binding.JSON); err != nil {
