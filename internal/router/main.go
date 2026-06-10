@@ -25,7 +25,7 @@ func InitRouter(router *gin.Engine, db *pgxpool.Pool, rdb *redis.Client, mailer 
 
 	routeApi := router.Group("/api")
 	UserRouter(routeApi, db, rdb)
-	MovieRouter(router, db, rdb)
+	MovieRouter(routeApi, db, rdb)
 	AuthRouter(routeApi, db, rdb, mailer)
 	OrderRouter(routeApi, db, rdb)
 

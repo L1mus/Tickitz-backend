@@ -9,14 +9,14 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func MovieRouter(router *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
+func MovieRouter(router *gin.RouterGroup, db *pgxpool.Pool, rdb *redis.Client) {
 	movieRouter := router.Group("/movies")
 
 	repositryMovie := repository.NewMovieRepository(db)
 	serviceMovie := service.NewMovieService(repositryMovie)
 	controllerMovie := controller.NewMovieController(serviceMovie)
 
-	movieRouter.GET("", controllerMovie.GetAllMovies)
+	movieRouter.GET("", controllerMovie.GetAll)
 	movieRouter.GET("/:id", controllerMovie.GetMovieDetail)
 	movieRouter.GET("/:id/showtime", controllerMovie.GetShowtimeFilter)
 

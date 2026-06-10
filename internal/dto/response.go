@@ -123,3 +123,21 @@ type MovieResponse struct {
 	Genres      []GenreDTO `json:"genres"`
 	ReleaseDate *time.Time `json:"release_date"`
 }
+
+type PaginationMeta struct {
+	CurrentPage int    `json:"current_page"`
+	Limit       int    `json:"limit"`
+	TotalData   int    `json:"total_data"`
+	TotalPage   int    `json:"total_page"`
+	HasNext     bool   `json:"has_next"`
+	HasPrev     bool   `json:"has_prev"`
+	Next        string `json:"next"`
+	Prev        string `json:"prev"`
+}
+
+type MoviePaginationResponse struct {
+	Status  string          `json:"status"`
+	Message string          `json:"message"`
+	Meta    PaginationMeta  `json:"meta"`
+	Data    []MovieResponse `json:"data"`
+}
