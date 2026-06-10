@@ -112,3 +112,46 @@ func (s *UserService) UpdateProfile(ctx context.Context, userID int, req dto.Use
 		Photo:     user.Photo,
 	}, nil
 }
+
+func (s *UserService) GetOrderHistory(ctx context.Context, userID int) ([]dto.OrderHistoryRes, error) {
+	dbHistory, err := s.userRepository.GetOrderHistoryById(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var responseList []dto.OrderHistoryRes
+
+	for _, item := range dbHistory {
+		formatDate := item.Showtime.Date.Format("Tuesday, 07 July 2020")
+
+		formatTime := item.Showtime.Time
+		parsedTime, err := time.Parse("16:30:00", item.Showtime.Time)
+		if err == nil {
+			formatTime = strings.ToLower(parsedTime.Format("04:30pm"))
+		}
+
+		fullShowtime := fmt.Sprintf("%s - %s", formatDate, formatTime)
+
+		ticketStatus := "Ticket used"
+		if item.Booking.StatusTicket == "active" {
+			ticketStatus = "Ticket in active"
+		}
+
+		paymentStatus := "Not Paid"
+		if item.Booking.StatusPaid == "paid" {
+			paymentStatus = "Paid"
+		}
+
+		responseList = append(responseList, dto.OrderHistoryRes{
+			BookingId:    item.Booking.Id,
+			MovieTitle:   item.Movie.Title,
+			CinemaName:   item.Cinema.Name,
+			CinemaLogo:   item.Cinema.Logo,
+			Showtime:     fullShowtime,
+			StatusTicket: ticketStatus,
+			StatusPaid:   paymentStatus,
+		})
+
+	}
+	return responseList, nil
+}

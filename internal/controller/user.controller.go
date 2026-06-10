@@ -94,7 +94,7 @@ func (c *UserController) UpdateProfile(ctx *gin.Context) {
 	}
 	claims, ok := token.(pkg.Claims)
 	if !ok {
-		response.Error(ctx, http.StatusUnauthorized, "Unauthorizzed: Format toket invalid")
+		response.Error(ctx, http.StatusUnauthorized, "Unauthorizzed: Format token invalid")
 		return
 	}
 
@@ -146,4 +146,43 @@ func (c *UserController) UpdateProfile(ctx *gin.Context) {
 	}
 
 	response.Success(ctx, http.StatusOK, "Update Profile Succesfully", res)
+}
+
+// @Summary	Get User Order History
+// @Description	Get list of Order History for logged-in User
+// @Tags	Users
+// @Accept	json
+// @Produce json
+// @Security	ApiKeyAuth
+// @Success 200 {object} []dto.OrderHistoryRes "Get Order History Succesfully"
+// @Failure     401  {object}  dto.ResponseError "Unauthorized: Token not exist / Format token invalid"
+// @Failure     500  {object}  dto.ResponseError "Internal Server Error"
+// @Router	/users/history [get]
+func (c *UserController) OrderHistory(ctx *gin.Context) {
+	token, exist := ctx.Get("claims")
+	if !exist {
+		response.Error(ctx, http.StatusUnauthorized, "Unauthorized: Token not exist")
+		return
+	}
+	claims, ok := token.(*pkg.Claims)
+	if !ok {
+		log.Println("cek: ", claims)
+		response.Error(ctx, http.StatusUnauthorized, "Unauthorizzed: Format token invalid")
+		return
+	}
+
+	history, err := c.userService.GetOrderHistory(ctx.Request.Context(), claims.Id)
+
+	if err != nil {
+		if errors.Is(err, apperror.ErrUserNotFound) {
+			response.Error(ctx, http.StatusUnauthorized, apperror.ErrInvalidCredentials.Error())
+			return
+		}
+
+		fmt.Println("Log error: 500", err.Error())
+		response.Error(ctx, http.StatusInternalServerError, apperror.ErrInternalServer.Error())
+		return
+	}
+
+	response.Success(ctx, http.StatusOK, "Get Order History Succesfully", history)
 }
