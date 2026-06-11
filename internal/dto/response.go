@@ -22,29 +22,29 @@ type ResponseError struct {
 	Error   string `json:"error" example:"internal server error/bad request"`
 }
 type ShowtimeItemDTO struct {
-	ShowtimeID  int       `json:"showtime_id"`
-	CinemaID    int       `json:"cinema_id"`
-	CinemaName  string    `json:"cinema_name"`
-	CinemaLogo  string    `json:"cinema_logo"`
-	ShowDate    time.Time `json:"show_date"`
-	ShowTime    string    `json:"show_time"`
-	TicketPrice int       `json:"ticket_price"`
+	ShowtimeID  int       `json:"showtime_id" example:"2"`
+	CinemaID    int       `json:"cinema_id" example:"1"`
+	CinemaName  string    `json:"cinema_name" example:"ebv.id Grand Indonesia"`
+	CinemaLogo  string    `json:"cinema_logo" example:" https://storage.tickitz.id/cinema/ebvid.png"`
+	ShowDate    time.Time `json:"show_date" example:"2025-06-10"`
+	ShowTime    string    `json:"show_time" example:"13:30:00"`
+	TicketPrice int       `json:"ticket_price" example:"75000"`
 }
 type LocationDTO struct {
-	ID   int    `json:"id"`
-	City string `json:"city"`
+	ID   int    `json:"id" example:"1"`
+	City string `json:"city" example:"Jakarta"`
 }
 type MovieDetailResponse struct {
-	ID          int        `json:"id"`
-	Title       string     `json:"title"`
-	Poster      string     `json:"poster"`
-	ReleaseDate *time.Time `json:"release_date"`
-	Duration    *string    `json:"duration"`
-	Synopsis    string     `json:"synopsis"`
-	Category    string     `json:"category"`
-	Directors   string     `json:"directors"`
-	Genres      []GenreDTO `json:"genres"`
-	Casts       []CastDTO  `json:"casts"`
+	ID          int        `json:"id" example:"1"`
+	Title       string     `json:"title" example:"Interstellar Reborn"`
+	Poster      string     `json:"poster" example:" https://storage.tickitz.id/posters/interstellar_reborn.jpg"`
+	ReleaseDate *time.Time `json:"release_date" example:"2025-03-15"`
+	Duration    *string    `json:"duration" example:"2:49:00"`
+	Synopsis    string     `json:"synopsis" example:"Seorang astronot nekat melintasi lubang cacing demi menyelamatkan umat manusia dari kehancuran bumi yang semakin tak layak huni. Perjalanan melintasi ruang dan waktu membawa konsekuensi yang tak pernah ia bayangkan sebelumnya."`
+	Category    string     `json:"category" example:"13+"`
+	Directors   string     `json:"directors" example:"Christopher Nolan"`
+	Genres      []GenreDTO `json:"genres" example:"[Sci-Fi, Adventure]"`
+	Casts       []CastDTO  `json:"casts" example:"[Cillian Murphy, Zendaya]"`
 }
 
 type ShowtimeFilterResponse struct {
