@@ -1,6 +1,15 @@
 package service
 
 import (
+	"context"
+	"fmt"
+	"log"
+	"math/rand"
+	"strings"
+	"time"
+
+	apperror "github.com/L1mus/Tickitz-backend/internal/appError"
+	"github.com/L1mus/Tickitz-backend/internal/dto"
 	"github.com/L1mus/Tickitz-backend/internal/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
