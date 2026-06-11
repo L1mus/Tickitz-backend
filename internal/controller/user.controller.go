@@ -47,7 +47,7 @@ func (c *UserController) GetUserProfile(ctx *gin.Context) {
 	}
 	claims, ok := token.(*pkg.Claims)
 	if !ok {
-		response.Error(ctx, http.StatusUnauthorized, "Unauthorizzed: Format toket invalid")
+		response.Error(ctx, http.StatusUnauthorized, "Unauthorizzed: Format token invalid")
 		return
 	}
 
@@ -95,7 +95,7 @@ func (c *UserController) UpdateProfile(ctx *gin.Context) {
 	}
 	claims, ok := token.(*pkg.Claims)
 	if !ok {
-		response.Error(ctx, http.StatusUnauthorized, "Unauthorizzed: Format token invalid")
+		response.Error(ctx, http.StatusUnauthorized, "Unauthorized: Format token invalid")
 		return
 	}
 
