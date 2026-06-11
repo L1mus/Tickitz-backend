@@ -24,6 +24,7 @@ type UserProfileResponse struct {
 	Photo     *string `json:"photo"`
 	Phone     *string `json:"phone"`
 	Point     *int    `json:"point"`
+	Location  string  `json:"location"`
 }
 
 type UserUpdateProfileReq struct {

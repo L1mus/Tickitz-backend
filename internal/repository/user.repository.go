@@ -17,27 +17,36 @@ func NewUserRepository(db *pgxpool.Pool) *UserRepository {
 	}
 }
 
-func (r *UserRepository) GetUserProfile(ctx context.Context, userID int) (*model.UserProfile, error) {
+func (r *UserRepository) GetUserProfile(ctx context.Context, userID int) (*model.Users, error) {
 	const q = `
-		SELECT id,
-			COALESCE(first_name, '') AS first_name,
-			COALESCE(last_name, '') AS last_name,
-			email,
-			COALESCE(phone, '') AS phone,
-			COALESCE(photo, '') AS photo,
-			point,
-			created_at,
-			updated_at
-		FROM users
-		WHERE id = $1`
+		SELECT u.id,
+			COALESCE(u.first_name, '') AS first_name,
+			COALESCE(u.last_name, '') AS last_name,
+			u.email,
+			COALESCE(u.phone, '') AS phone,
+			COALESCE(u.photo, '') AS photo,
+			COALESCE(l.city, '') AS location,
+			u.point,
+			u.created_at,	
+			u.updated_at
+		FROM users u
+		LEFT JOIN locations l ON u.location_id = l.id
+		WHERE u.id = $1
+		`
 
 	row := r.db.QueryRow(ctx, q, userID)
-	var up model.UserProfile
-	err := row.Scan(&up.Id, &up.FirstName, &up.LastName, &up.Email, &up.Phone, &up.Photo, &up.Point, &up.Created_At, &up.Updated_At)
+	var u model.Users
+	var cityName string
+	err := row.Scan(&u.ID, &u.First_Name, &u.Last_Name, &u.Email, &u.Phone, &u.Photo, &cityName, &u.Point, &u.Created_At, &u.Updated_At)
 	if err != nil {
 		return nil, err
 	}
-	return &up, nil
+	if cityName != "" {
+		u.Location = &model.Locations{
+			Name: cityName,
+		}
+	}
+	return &u, nil
 }
 
 func (r *UserRepository) UpdateProfileById(ctx context.Context, userID int, firstName, lastName, phone, photo, hashedPassword *string) (model.UserProfile, error) {

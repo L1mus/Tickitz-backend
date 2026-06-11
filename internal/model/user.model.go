@@ -14,9 +14,10 @@ type Users struct {
 	Photo      *string    `json:"photo" db:"photo"`
 	Role       string     `json:"role" db:"role"`
 	Location   *Locations `json:"location" db:"location_id"`
+	Point      int        `json:"point" db:"point"`
 	Is_Active  bool       `json:"is_active" db:"isactive"`
 	Created_At time.Time  `json:"created_at" db:"created_at"`
-	Updated_At time.Time  `json:"updated_at" db:"updated_at"`
+	Updated_At *time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type Locations struct {
