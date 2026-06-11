@@ -109,16 +109,7 @@ func (s *OrderService) CreateBooking(ctx context.Context, req dto.CreateBookingR
 	if err != nil {
 		log.Println("failed to begin transaction", err)
 	}
-	defer func(tx pgx.Tx, ctx context.Context) {
-		err := tx.Rollback(ctx)
-		if err != nil {
-			log.Println("rollback transaction: ", err.Error())
-		}
-	}(tx, ctx)
-	detailMovie, err := s.orderRepo.GetShowtimeSummary(ctx, tx, req.ShowtimeID)
-	if err != nil {
-		return dto.CreateBookingResponse{}, err
-	}
+	defer tx.Rollback(ctx)
 
 	takenCount, err := s.orderRepo.CheckSeatsAvailable(ctx, tx, req.SeatIDs, req.ShowtimeID)
 	if err != nil {
