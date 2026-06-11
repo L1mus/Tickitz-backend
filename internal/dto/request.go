@@ -3,21 +3,22 @@ package dto
 import "time"
 
 type ShowtimeFilterRequest struct {
-	Date     time.Time `json:"date"`
-	City     string    `json:"city"`
-	ShowTime *string   `json:"show_time,omitempty"`
+	Date     time.Time `json:"date" example:"YYYY-MM-DD"`
+	City     string    `json:"city" example:"Jakarta"`
+	ShowTime *string   `json:"show_time,omitempty" example:"hh:mm:ss"`
 }
 
 type CreateBookingRequest struct {
-	ShowtimeID int   `json:"showtime_id" binding:"required"`
-	SeatIDs    []int `json:"seat_ids"    binding:"required,min=1"`
-	Quantity   int   `json:"quantity"    binding:"required,min=1"`
+	ShowtimeID int   `json:"showtime_id" binding:"required" example:"1"`
+	SeatIDs    []int `json:"seat_ids"    binding:"required,min=1" example:"[1,2,3,4]"`
+	Quantity   int   `json:"quantity"    binding:"required,min=1" example:"4"`
 }
 
 type SubmitPaymentRequest struct {
-	PaymentMethodID int `json:"payment_method_id" binding:"required"`
+	BookingID       int `json:"booking_id" binding:"required" example:"56"`
+	PaymentMethodID int `json:"payment_method_id" binding:"required" example:"3"`
 }
 
 type OrderSeatRequest struct {
-	ShowtimeId int `form:"showtime_id" binding:"required"`
+	ShowtimeId int `form:"showtime_id" binding:"required" example:"1"`
 }
