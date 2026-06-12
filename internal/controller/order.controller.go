@@ -2,7 +2,6 @@ package controller
 
 import (
 	"errors"
-	"log"
 	"net/http"
 
 	apperror "github.com/L1mus/Tickitz-backend/internal/appError"
@@ -24,15 +23,25 @@ func NewOrderController(orderService *service.OrderService) *OrderController {
 	}
 }
 
+// @Summary		Get Seats
+// @Description	Get seats data
+// @Tags         Orders
+// @Security     ApiKeyAuth
+// @Accept       json
+// @Produce      json
+// @Param        showtime_id  query     int     true  "ID showtime"
+// @Success		200 {object} dto.SeatPageResponse
+// @Failure 	400 {object} dto.ResponseError "bad request"
+// @Failure 	500 {object} dto.ResponseError "internal Server Error"
+// @Router		/order/seats [get]
 func (c *OrderController) GetSeats(ctx *gin.Context) {
-	//_, exist := ctx.Get("claims")
-	//if !exist {
-	//	response.Error(ctx, http.StatusUnauthorized, "unauthorized")
-	//	return
-	//}
+	_, exist := ctx.Get("claims")
+	if !exist {
+		response.Error(ctx, http.StatusUnauthorized, "unauthorized")
+		return
+	}
 	var payload dto.OrderSeatRequest
 	if err := ctx.ShouldBindWith(&payload, binding.Query); err != nil {
-		log.Println(payload.ShowtimeId)
 		response.Error(ctx, http.StatusBadRequest, "bad request")
 		return
 	}
@@ -43,10 +52,28 @@ func (c *OrderController) GetSeats(ctx *gin.Context) {
 	response.Success(ctx, http.StatusOK, "get all information Success", res)
 }
 
+// @Summary		Create Boking
+// @Description	Create Booking seat on cinema
+// @Tags         Orders
+// @Security     ApiKeyAuth
+// @Accept       json
+// @Produce      json
+// @Param        body         body      dto.CreateBookingRequest  true  "Payload data seats and tickets"
+// @Success		200 {object} dto.CreateBookingResponse
+// @Failure 	400 {object} dto.ResponseError "bad request"
+// @Failure 	401 {object} dto.ResponseError "unauthorize"
+// @Failure 	406 {object} dto.ResponseError "seats is required" "quantity is not the same as the number of seats ordered" "seat already taken"
+// @Failure 	500 {object} dto.ResponseError "internal Server Error"
+// @Router		/order/booking [post]
 func (c *OrderController) CreateBooking(ctx *gin.Context) {
-	token, _ := ctx.Get("claims")
-	log.Println(token)
-	claims := token.(pkg.Claims)
+	token, exist := ctx.Get("claims")
+	if !exist {
+		response.Error(ctx, http.StatusUnauthorized, "unauthorized need login")
+	}
+	//defer func() {
+	//	recover()
+	//}()
+	claims := token.(*pkg.Claims)
 
 	var payload dto.CreateBookingRequest
 	if err := ctx.ShouldBindWith(&payload, binding.JSON); err != nil {

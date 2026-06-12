@@ -7,6 +7,7 @@ import (
 	"time"
 
 	apperror "github.com/L1mus/Tickitz-backend/internal/appError"
+	"github.com/L1mus/Tickitz-backend/internal/cache"
 	"github.com/L1mus/Tickitz-backend/internal/dto"
 	"github.com/L1mus/Tickitz-backend/internal/model"
 	"github.com/L1mus/Tickitz-backend/internal/repository"
@@ -73,7 +74,7 @@ func (as *AuthService) Login(ctx context.Context, req dto.LoginRequest) (dto.Log
 		fullName = fmt.Sprintf("%s %s", fullName, *user.Last_Name)
 	}
 
-	claims := pkg.NewClaims(int(user.ID), fullName)
+	claims := pkg.NewClaims(int(user.ID), fullName, user.Role)
 	token, err := claims.GenJWT()
 	if err != nil {
 		return dto.LoginResponse{}, apperror.ErrInternalServer
@@ -82,6 +83,10 @@ func (as *AuthService) Login(ctx context.Context, req dto.LoginRequest) (dto.Log
 	return dto.LoginResponse{
 		Message: "Login successful",
 		Token:   token,
+		User: dto.UserDetails{
+			Email: user.Email,
+			Role:  user.Role,
+		},
 	}, nil
 }
 
@@ -111,6 +116,7 @@ func (as *AuthService) Register(ctx context.Context, req dto.RegisterRequest) (d
 	newUser := &model.Users{
 		Email:    req.Email,
 		Password: hashedPassword,
+		Role:     "user",
 	}
 
 	if err := as.authRepo.CreateUser(ctx, newUser); err != nil {
@@ -279,5 +285,13 @@ func (as *AuthService) ResendOTP(ctx context.Context, req dto.ResendOTPRequest) 
 
 	}
 
+	return nil
+}
+
+func (as *AuthService) Logout(ctx context.Context, token string) error {
+	err := cache.SaveToBlacklist(ctx, as.rdb, token, 24*time.Hour)
+	if err != nil {
+		return err
+	}
 	return nil
 }

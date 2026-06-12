@@ -9,16 +9,17 @@ type PaymentMethod struct {
 }
 
 type BookingSummary struct {
-	BookingID    int
-	MovieTitle   string
-	Category     string
-	CinemaName   string
-	ShowDate     time.Time
-	ShowTime     string
-	TicketPrice  int
-	Quantity     int
-	TotalPayment int
-	StatusPaid   string
+	BookingID    int       `db:"booking_id"`
+	UserID       int       `db:"user_id"`
+	MovieTitle   string    `db:"movie_title"`
+	Category     string    `db:"category"`
+	CinemaName   string    `db:"cinema_name"`
+	ShowDate     time.Time `db:"show_date"`
+	ShowTime     string    `db:"show_time"`
+	TicketPrice  int       `db:"ticket_price"`
+	Quantity     int       `db:"quantity"`
+	TotalPayment int       `db:"total_payment"`
+	StatusPaid   string    `db:"status_paid"`
 }
 
 type BookedSeat struct {

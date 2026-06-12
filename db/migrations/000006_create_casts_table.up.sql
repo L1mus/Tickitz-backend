@@ -1,5 +1,5 @@
-
-CREATE TABLE casts (
-                       id SERIAL PRIMARY KEY,
-                       name VARCHAR(255) NOT NULL
+CREATE TABLE casts
+(
+    id   SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
 );

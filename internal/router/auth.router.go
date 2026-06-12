@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/L1mus/Tickitz-backend/internal/controller"
+	"github.com/L1mus/Tickitz-backend/internal/middleware"
 	"github.com/L1mus/Tickitz-backend/internal/repository"
 	"github.com/L1mus/Tickitz-backend/internal/service"
 	"github.com/L1mus/Tickitz-backend/pkg"
@@ -25,4 +26,5 @@ func AuthRouter(router *gin.RouterGroup, db *pgxpool.Pool, rdb *redis.Client, ma
 	authRouter.POST("/check-email", authController.ForgotPassword)
 	authRouter.POST("/check-email/verify-otp", authController.VerifyResetOTP)
 	authRouter.POST("/check-email/verify-otp/reset", authController.ResetPassword)
+	authRouter.DELETE("/logout", middleware.VerifyToken, middleware.CheckBlacklist(rdb), authController.Logout)
 }

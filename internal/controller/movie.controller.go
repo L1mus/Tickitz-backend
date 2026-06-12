@@ -28,7 +28,7 @@ func NewMovieController(movieService *service.MovieService) *MovieController {
 
 // @Summary      Get All movies
 // @Description  fetch all movie data to be displayed on the main page
-// @Tags         movie
+// @Tags         Movies
 // @Accept       json
 // @Produce      json
 // @Success      200 {object} dto.MoviePaginationResponse "Success to get data"
@@ -92,6 +92,15 @@ func (c *MovieController) GetAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
+// @Summary		Get Movie Detail
+// @Description	Get the Movie detail data
+// @Tags		Movies
+// @Produce		json
+// @Security	ApiKeyAuth
+// @Param        id   path      int  true  "Movie ID"
+// @Success		200 {object} dto.MovieDetailResponse
+// @Failure 	500 {object} dto.ResponseError "Internal Server Error"
+// @Router		/movies/:id [get]
 func (c *MovieController) GetMovieDetail(ctx *gin.Context) {
 	idString := ctx.Param("id")
 	id, _ := strconv.Atoi(idString)
@@ -104,6 +113,17 @@ func (c *MovieController) GetMovieDetail(ctx *gin.Context) {
 	response.Success(ctx, http.StatusOK, "Get detail movie success", res)
 }
 
+// @Summary		Get Showtime Filter
+// @Description	Get the Showtime data filtered result
+// @Tags         Movies
+// @Accept       json
+// @Produce      json
+// @Param        id       path      int                          true  "Movie ID"
+// @Param        body     body      dto.ShowtimeFilterRequest    true  "Payload filter showtime"
+// @Success		200 {object} dto.ShowtimeFilterResponse
+// @Failure 	400 {object} dto.ResponseError "bad request" "must be filled"
+// @Failure 	500 {object} dto.ResponseError "internal Server Error"
+// @Router		/movies/:id/showtime [get]
 func (c *MovieController) GetShowtimeFilter(ctx *gin.Context) {
 	var payload dto.ShowtimeFilterRequest
 	idString := ctx.Param("id")

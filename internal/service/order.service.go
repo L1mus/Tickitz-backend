@@ -7,7 +7,6 @@ import (
 	apperror "github.com/L1mus/Tickitz-backend/internal/appError"
 	"github.com/L1mus/Tickitz-backend/internal/dto"
 	"github.com/L1mus/Tickitz-backend/internal/repository"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -39,11 +38,8 @@ func (s *OrderService) GetSeats(ctx context.Context, showtimeID int) (dto.SeatPa
 	if err != nil {
 		return dto.SeatPageResponse{}, err
 	}
-	defer func(tx pgx.Tx, ctx context.Context) {
-		if err != nil {
-			log.Println("rollback error: ", err.Error())
-		}
-	}(tx, ctx)
+	defer tx.Rollback(ctx)
+
 	detailMovie, err := s.orderRepo.GetShowtimeSummary(ctx, tx, showtimeID)
 	if err != nil {
 		return dto.SeatPageResponse{}, err
@@ -55,13 +51,13 @@ func (s *OrderService) GetSeats(ctx context.Context, showtimeID int) (dto.SeatPa
 	}
 
 	var seats []dto.SeatDTO
-	for _, s := range data {
+	for _, seat := range data {
 		seat := dto.SeatDTO{
-			SeatID:     s.SeatID,
-			Row:        s.Row,
-			SeatNumber: s.SeatNumber,
-			SeatType:   s.SeatType,
-			SeatStatus: s.SeatStatus,
+			SeatID:     seat.SeatID,
+			Row:        seat.Row,
+			SeatNumber: seat.SeatNumber,
+			SeatType:   seat.SeatType,
+			SeatStatus: seat.SeatStatus,
 		}
 		seats = append(seats, seat)
 	}
@@ -113,28 +109,14 @@ func (s *OrderService) CreateBooking(ctx context.Context, req dto.CreateBookingR
 	if err != nil {
 		log.Println("failed to begin transaction", err)
 	}
-	defer func(tx pgx.Tx, ctx context.Context) {
-		err := tx.Rollback(ctx)
-		if err != nil {
-			log.Println("rollback transaction: ", err.Error())
-		}
-	}(tx, ctx)
-	detailMovie, err := s.orderRepo.GetShowtimeSummary(ctx, tx, req.ShowtimeID)
+	defer tx.Rollback(ctx)
+
+	takenCount, err := s.orderRepo.CheckSeatsAvailable(ctx, tx, req.SeatIDs, req.ShowtimeID)
 	if err != nil {
 		return dto.CreateBookingResponse{}, err
 	}
-
-	dataSeats, err := s.orderRepo.GetSeatsByShowtime(ctx, tx, req.ShowtimeID, detailMovie.CinemaID)
-	if err != nil {
-		return dto.CreateBookingResponse{}, err
-	}
-
-	for _, s := range dataSeats {
-		for _, ts := range req.SeatIDs {
-			if s.SeatID == ts && s.SeatStatus != "Available" {
-				return dto.CreateBookingResponse{}, apperror.SeatsUnavailable
-			}
-		}
+	if takenCount > 0 {
+		return dto.CreateBookingResponse{}, apperror.SeatsUnavailable
 	}
 
 	bookingId, err := s.orderRepo.CreateBooking(ctx, tx, req, userID)

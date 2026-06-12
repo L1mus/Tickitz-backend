@@ -95,3 +95,16 @@ func (r *OrderRepository) CreateBookingSeat(ctx context.Context, tx OrderDBTX, b
 	_, err := tx.Exec(ctx, q, bookingID, seatID, showtimeID)
 	return err
 }
+
+func (r *OrderRepository) CheckSeatsAvailable(ctx context.Context, tx OrderDBTX, seatIDs []int, showtimeID int,
+) (int, error) {
+	const q = `
+        SELECT COUNT(*)
+        FROM booking_seats
+        WHERE seat_id    = ANY($1)
+          AND showtime_id = $2`
+
+	var count int
+	err := tx.QueryRow(ctx, q, seatIDs, showtimeID).Scan(&count)
+	return count, err
+}

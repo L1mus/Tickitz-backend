@@ -3,7 +3,7 @@ CREATE TABLE transactions
     id                SERIAL PRIMARY KEY,
     booking_id        INTEGER,
     payment_method_id INTEGER,
-    virtual_rek       INTEGER,
+    virtual_rek       BIGINT,
     total_price       INTEGER NOT NULL,
     status            status_transaction,
     qr_code           VARCHAR(255),
