@@ -43,8 +43,8 @@ type MovieDetailResponse struct {
 	Synopsis    string     `json:"synopsis" example:"Seorang astronot nekat melintasi lubang cacing demi menyelamatkan umat manusia dari kehancuran bumi yang semakin tak layak huni. Perjalanan melintasi ruang dan waktu membawa konsekuensi yang tak pernah ia bayangkan sebelumnya."`
 	Category    string     `json:"category" example:"13+"`
 	Directors   string     `json:"directors" example:"Christopher Nolan"`
-	Genres      []GenreDTO `json:"genres" example:"[Sci-Fi, Adventure]"`
-	Casts       []CastDTO  `json:"casts" example:"[Cillian Murphy, Zendaya]"`
+	Genres      []GenreDTO `json:"genres"`
+	Casts       []CastDTO  `json:"casts"`
 }
 
 type ShowtimeFilterResponse struct {
