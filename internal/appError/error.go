@@ -20,6 +20,7 @@ var (
 	SeatsUnavailable        = errors.New("seat already taken")
 	ErrAccountNotActivated  = errors.New("ACCOUNT_NOT_ACTIVATED")
 	ErrAccountAlreadyActive = errors.New("account is already activated")
-	ErrPasswordMismatch     = errors.New("confirm password does not match")
 	ErrResetTokenExpired    = errors.New("unauthorized or session expired, please verify OTP again")
+	ErrMissingAuthHeader    = errors.New("authorization header is required")
+	ErrTokenRevoked         = errors.New("token has been revoked or logged out")
 )
