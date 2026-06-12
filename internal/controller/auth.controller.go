@@ -301,3 +301,34 @@ func (c *AuthController) ResetPassword(ctx *gin.Context) {
 
 	response.Success(ctx, http.StatusOK, "Password has been reset successfully", nil)
 }
+
+// @Summary      Logout User
+// @Description  Invalidate current JWT token by adding it to Redis blacklist
+// @Tags         Auth
+// @Produce      json
+// @Security     ApiKeyAuth
+// @Success      200 {object} dto.ResponseSuccess "Logout successful"
+// @Failure      401 {object} dto.ResponseError "Unauthorized or token not found"
+// @Failure      500 {object} dto.ResponseError "Internal server error"
+// @Router       /auth/logout [delete]
+func (c *AuthController) Logout(ctx *gin.Context) {
+	rawToken, exists := ctx.Get("raw_token")
+	if !exists {
+		response.Error(ctx, http.StatusUnauthorized, "Invalid session or token not found")
+		return
+	}
+	tokenString, ok := rawToken.(string)
+	if !ok || tokenString == "" {
+		response.Error(ctx, http.StatusUnauthorized, "Invalid token format")
+		return
+	}
+
+	err := c.authService.Logout(ctx.Request.Context(), tokenString)
+	if err != nil {
+		// fmt.Println("LOG ERROR 500:", err.Error())
+		response.Error(ctx, http.StatusInternalServerError, apperror.ErrInternalServer.Error())
+		return
+	}
+
+	response.Success(ctx, http.StatusOK, "Logout successful", nil)
+}

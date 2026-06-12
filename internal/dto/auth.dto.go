@@ -23,8 +23,14 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Message string `json:"message"`
-	Token   string `json:"token"`
+	Message string      `json:"message"`
+	Token   string      `json:"token"`
+	User    UserDetails `json:"user"`
+}
+
+type UserDetails struct {
+	Email string `json:"email"`
+	Role  string `json:"role"`
 }
 
 type ForgotPasswordRequest struct {

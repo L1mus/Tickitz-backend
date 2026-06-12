@@ -1,4 +1,3 @@
-
 DO
 $$
     BEGIN
@@ -12,10 +11,10 @@ DO
 $$
     BEGIN
         CREATE TYPE condition_ticket AS ENUM
-        (
-            'active',
-            'not_active'
-        );
+            (
+                'active',
+                'not_active'
+                );
     EXCEPTION
         WHEN duplicate_object THEN NULL;
     END

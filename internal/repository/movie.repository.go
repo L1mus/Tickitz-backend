@@ -151,11 +151,11 @@ func (r *MovieRepository) GetAvailableLocations(ctx context.Context, movieID int
 }
 
 func (r *MovieRepository) GetAllMovies(ctx context.Context, search, genre, status, limit, page string) ([]model.Movies, error) {
-	q := `SELECT m.id, m.title, STRING_AGG(g.id || ':' || g.genre, ',') AS genre, m.poster, m.release_date 
-				FROM movies m
-				JOIN movie_genres mg ON mg.movie_id = m.id 
-				JOIN genres g ON g.id = mg.genre_id
-				WHERE 1=1`
+	q := `SELECT m.id, m.title, COALESCE(STRING_AGG(g.id || ':' || g.genre, ','), '') AS genre, m.poster, m.release_date 
+          FROM movies m
+          JOIN movie_genres mg ON mg.movie_id = m.id 
+          JOIN genres g ON g.id = mg.genre_id
+          WHERE 1=1`
 	var args []any
 	argCount := 1
 
@@ -176,18 +176,20 @@ func (r *MovieRepository) GetAllMovies(ctx context.Context, search, genre, statu
 	}
 
 	if status == "now_showing" {
-		q += " AND m.release_date >= CURRENT_DATE - INTERVAL '1 month' AND m.release_date <= CURRENT_DATE"
+		q += " AND m.release_date >= (CURRENT_DATE - INTERVAL '1 month')::date AND m.release_date <= CURRENT_DATE::date"
 	} else if status == "upcoming" {
-		q += " AND m.release_date > CURRENT_DATE"
+		q += " AND m.release_date > CURRENT_DATE::date"
 	}
 
 	q += " GROUP BY m.id, m.title, m.poster, m.release_date"
 
-	if status == "upcoming" {
-		q += " ORDER BY m.release_date ASC"
-	} else {
-		q += " ORDER BY m.release_date DESC"
-	}
+if status == "upcoming" {
+    q += " ORDER BY m.release_date ASC, m.id ASC"
+} else if status == "now_showing" {
+    q += " ORDER BY m.release_date DESC, m.id DESC"
+} else {
+    q += " ORDER BY m.release_date ASC, m.id ASC"
+}
 
 	pageInt, err := strconv.Atoi(page)
 	if err != nil || pageInt < 1 {
@@ -206,6 +208,7 @@ func (r *MovieRepository) GetAllMovies(ctx context.Context, search, genre, statu
 	args = append(args, limitSize, offsetSize)
 
 	rows, err := r.db.Query(ctx, q, args...)
+
 	if err != nil {
 		return nil, err
 	}
@@ -242,8 +245,8 @@ func (r *MovieRepository) GetAllMovies(ctx context.Context, search, genre, statu
 func (r *MovieRepository) GetTotalCount(ctx context.Context, search, genre, status string) (int, error) {
 	query := `SELECT COUNT(DISTINCT m.id) 
 			  FROM movies m
-			  JOIN movie_genres mg ON mg.movie_id = m.id 
-			  JOIN genres g ON g.id = mg.genre_id
+			  LEFT JOIN movie_genres mg ON mg.movie_id = m.id 
+			  LEFT JOIN genres g ON g.id = mg.genre_id
 			  WHERE 1=1`
 
 	var args []any
@@ -256,15 +259,19 @@ func (r *MovieRepository) GetTotalCount(ctx context.Context, search, genre, stat
 	}
 
 	if genre != "" {
-		query += fmt.Sprintf(" AND LOWER(g.genre) = $%d", argCount)
+		query += fmt.Sprintf(` AND m.id IN (
+			SELECT movie_id FROM movie_genres 
+			JOIN genres ON genres.id = movie_genres.genre_id 
+			WHERE LOWER(genres.genre) = $%d
+		)`, argCount)
 		args = append(args, strings.ToLower(genre))
 		argCount++
 	}
 
 	if status == "now_showing" {
-		query += " AND m.release_date >= CURRENT_DATE - INTERVAL '1 month' AND m.release_date <= CURRENT_DATE"
+		query += " AND m.release_date >= (CURRENT_DATE - INTERVAL '1 month')::date AND m.release_date <= CURRENT_DATE::date"
 	} else if status == "upcoming" {
-		query += " AND m.release_date > CURRENT_DATE"
+		query += " AND m.release_date > CURRENT_DATE::date"
 	}
 
 	var total int
