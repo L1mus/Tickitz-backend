@@ -340,26 +340,25 @@ INSERT INTO movie_casts (movie_id, cast_id) VALUES
 (17,20),                     -- Minions & Monsters: Steve Carell (Gru)
 (18,26),(18,28);             -- Backrooms: Prilly, Nicholas Saputra
 
-
 -- ============================================================
 -- 10. CINEMAS (15 bioskop — sama seperti sebelumnya)
 -- ============================================================
 INSERT INTO cinemas (id, location_id, name, logo, capacity, isAvailable) VALUES
-(1,  1, 'ebv.id Grand Indonesia',         'https://storage.tickitz.id/cinema/ebvid.png',      98, true),
-(2,  1, 'hiflix FX Sudirman',             'https://storage.tickitz.id/cinema/hiflix.png',     98, true),
-(3,  1, 'CineOne21 Taman Ismail Marzuki', 'https://storage.tickitz.id/cinema/cineone21.png',  98, true),
-(4,  2, 'ebv.id Tunjungan Plaza',         'https://storage.tickitz.id/cinema/ebvid.png',      98, true),
-(5,  2, 'hiflix Galaxy Mall',             'https://storage.tickitz.id/cinema/hiflix.png',     98, true),
-(6,  2, 'CineOne21 Pakuwon Mall',         'https://storage.tickitz.id/cinema/cineone21.png',  98, true),
-(7,  3, 'ebv.id Paris Van Java',          'https://storage.tickitz.id/cinema/ebvid.png',      98, true),
-(8,  3, 'hiflix Bandung Indah Plaza',     'https://storage.tickitz.id/cinema/hiflix.png',     98, true),
-(9,  4, 'CineOne21 Sun Plaza',            'https://storage.tickitz.id/cinema/cineone21.png',  98, true),
-(10, 5, 'ebv.id Paragon Mall',            'https://storage.tickitz.id/cinema/ebvid.png',      98, true),
-(11, 9, 'hiflix Ambarrukmo Plaza',        'https://storage.tickitz.id/cinema/hiflix.png',     98, true),
-(12, 8, 'CineOne21 Bali Galeria',         'https://storage.tickitz.id/cinema/cineone21.png',  98, true),
-(13, 6, 'ebv.id Panakukang Mall',         'https://storage.tickitz.id/cinema/ebvid.png',      98, true),
-(14, 7, 'hiflix Palembang Square',        'https://storage.tickitz.id/cinema/hiflix.png',     98, true),
-(15,11, 'CineOne21 Mayfair Purwokerto',   'https://storage.tickitz.id/cinema/cineone21.png',  98, false);
+(1,  1, 'ebv.id Grand Indonesia',          '/img/cinemas/ebv.id-black.svg',      98, true),
+(2,  1, 'hiflix FX Sudirman',              '/img/cinemas/hiflix-2.svg',          98, true),
+(3,  1, 'CineOne21 Taman Ismail Marzuki',  '/img/cinemas/CineOne21-2.svg',       98, true),
+(4,  2, 'ebv.id Tunjungan Plaza',          '/img/cinemas/ebv.id-black.svg',      98, true),
+(5,  2, 'hiflix Galaxy Mall',              '/img/cinemas/hiflix-2.svg',          98, true),
+(6,  2, 'CineOne21 Pakuwon Mall',          '/img/cinemas/CineOne21-2.svg',       98, true),
+(7,  3, 'ebv.id Paris Van Java',           '/img/cinemas/ebv.id-black.svg',      98, true),
+(8,  3, 'hiflix Bandung Indah Plaza',      '/img/cinemas/hiflix-2.svg',          98, true),
+(9,  4, 'CineOne21 Sun Plaza',             '/img/cinemas/CineOne21-2.svg',       98, true),
+(10, 5, 'ebv.id Paragon Mall',             '/img/cinemas/ebv.id-black.svg',      98, true),
+(11, 9, 'hiflix Ambarrukmo Plaza',         '/img/cinemas/hiflix-2.svg',          98, true),
+(12, 8, 'CineOne21 Bali Galeria',          '/img/cinemas/CineOne21-2.svg',       98, true),
+(13, 6, 'ebv.id Panakukang Mall',          '/img/cinemas/ebv.id-black.svg',      98, true),
+(14, 7, 'hiflix Palembang Square',         '/img/cinemas/hiflix-2.svg',          98, true),
+(15, 11, 'CineOne21 Mayfair Purwokerto',   '/img/cinemas/CineOne21-2.svg',       98, false);
 
 
 -- ============================================================
