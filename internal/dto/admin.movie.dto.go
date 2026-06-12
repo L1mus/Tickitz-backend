@@ -60,6 +60,18 @@ type AdminEditMovieRequest struct {
 	Times          []string              `form:"times"`
 }
 
+type OptionItem struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type MovieOptionsResponse struct {
+	Genres    []OptionItem `json:"genres"`
+	Directors []OptionItem `json:"directors"`
+	Casts     []OptionItem `json:"casts"`
+	Locations []OptionItem `json:"locations"`
+}
+
 // AdminResponseSuccess adalah struktur dasar untuk merespon request yang berhasil di Swagger
 type AdminResponseSuccess struct {
 	Status  string      `json:"status" example:"success"`

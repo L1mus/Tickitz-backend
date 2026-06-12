@@ -101,10 +101,11 @@ func (c *AdminMovieController) AdminCreateMovie(ctx *gin.Context) {
 		".jpg":  true,
 		".jpeg": true,
 		".png":  true,
+		".webp": true,
 	}
 
 	if !allowedExtensions[extension] {
-		response.Error(ctx, http.StatusBadRequest, "Invalid image format. Only .jpg, .jpeg, and .png are allowed")
+		response.Error(ctx, http.StatusBadRequest, "Invalid image format. Only .jpg, .jpeg,.png and webp are allowed")
 		return
 	}
 
@@ -150,7 +151,7 @@ func (c *AdminMovieController) AdminCreateMovie(ctx *gin.Context) {
 // @Failure      400 {object}    dto.AdminResponseError "Payload input tidak valid"
 // @Failure      404 {object}    dto.AdminResponseError "Film tidak ditemukan"
 // @Failure      500 {object}    dto.AdminResponseError "Internal server error"
-// @Router       /admin/movies/{id} [put]
+// @Router       /admin/movies/{id} [patch]
 func (c *AdminMovieController) AdminUpdateMovie(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	movieID, err := strconv.Atoi(idStr)
