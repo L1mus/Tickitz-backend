@@ -125,12 +125,12 @@ func (s *UserService) GetOrderHistory(ctx context.Context, userID int) ([]dto.Or
 	var responseList []dto.OrderHistoryRes
 
 	for _, item := range dbHistory {
-		formatDate := item.Showtime.Date.Format("Tuesday, 07 July 2020")
+		formatDate := item.Showtime.Date.Format("Monday, 02 January 2006")
 
 		formatTime := item.Showtime.Time
-		parsedTime, err := time.Parse("16:30:00", item.Showtime.Time)
+		parsedTime, err := time.Parse("15:04:00", item.Showtime.Time)
 		if err == nil {
-			formatTime = strings.ToLower(parsedTime.Format("04:30pm"))
+			formatTime = strings.ToLower(parsedTime.Format("03:04pm"))
 		}
 
 		fullShowtime := fmt.Sprintf("%s - %s", formatDate, formatTime)
@@ -170,7 +170,7 @@ func (s *UserService) GetInformationDetail(ctx context.Context, bookingID, userI
 		ticketStatus = "Ticket in active"
 	}
 
-	paymentStatus := "Ticked used"
+	paymentStatus := "Ticket used"
 	if raw.StatusPaid == "paid" {
 		paymentStatus = "Paid"
 	}
@@ -179,10 +179,25 @@ func (s *UserService) GetInformationDetail(ctx context.Context, bookingID, userI
 		BookingId:    raw.BookingId,
 		StatusTicket: ticketStatus,
 		StatusPaid:   paymentStatus,
+		MovieTitle:   raw.MovieTitle,
+		Category:     raw.Category,
+		Quantity:     raw.Quantity,
 	}
 
 	if raw.TotalPrice != nil {
 		res.TotalPrice = *raw.TotalPrice
+	}
+
+	res.ShowtimeDate = raw.ShowtimeDate.Format("02 Jan")
+	t, err := time.Parse("15:04:00", raw.ShowtimeTime)
+	if err == nil {
+		res.ShowtimeTime = strings.ToLower(t.Format("03:04pm"))
+	}
+
+	if raw.SeatList != nil && *raw.SeatList != "" {
+		res.Seats = strings.Split(*raw.SeatList, ",")
+	} else {
+		res.Seats = []string{}
 	}
 
 	if raw.StatusPaid != "paid" {
@@ -191,25 +206,10 @@ func (s *UserService) GetInformationDetail(ctx context.Context, bookingID, userI
 		}
 
 		dueDate := raw.CreatedAt.Add(24 * time.Hour)
-		res.DueDateMessage = fmt.Sprintf("Pay this payment bill before it is due, on %s. If the bill has not been paid by the specified time, it will be forfeited", dueDate.Format("January 02, 2006"))
+		res.DueDate = dueDate.Format("January 02, 2006")
 	} else {
 		if raw.QrCode != nil {
 			res.QrCode = *raw.QrCode
-		}
-		res.Category = raw.Category
-		res.MovieTitle = raw.MovieTitle
-		res.Quantity = raw.Quantity
-		res.ShowtimeDate = raw.ShowtimeDate.Format("02 Jan")
-
-		t, err := time.Parse("15:04:00", raw.ShowtimeTime)
-		if err == nil {
-			res.ShowtimeTime = strings.ToLower(t.Format("03:04pm"))
-		}
-
-		if raw.SeatList != nil && *raw.SeatList != "" {
-			res.Seats = strings.Split(*raw.SeatList, ",")
-		} else {
-			res.Seats = []string{}
 		}
 	}
 

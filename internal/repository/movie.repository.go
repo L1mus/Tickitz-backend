@@ -7,7 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/L1mus/Tickitz-backend/internal/dto"
 	"github.com/L1mus/Tickitz-backend/internal/model"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -295,6 +297,53 @@ func (r *MovieRepository) GetTotalCount(ctx context.Context, search, genre, stat
 	var total int
 	err := r.db.QueryRow(ctx, query, args...).Scan(&total)
 	return total, err
+}
+
+func (r *MovieRepository) GetShowtimeDetailsByMovieID(ctx context.Context, movieID int) ([]dto.ShowtimeDetail, error) {
+	query := `
+			SELECT 
+				s.id, s.date, s.time, s.price,
+				l.city, c.id, c.name, c.logo, m.poster
+			FROM showtimes s
+			JOIN cinemas c ON s.cinema_id = c.id
+			JOIN locations l ON c.location_id = l.id
+			JOIN movies m ON s.movie_id = m.id
+			WHERE s.movie_id = $1
+			ORDER BY s.date ASC, s.time ASC;
+		`
+
+	rows, err := r.db.Query(ctx, query, movieID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var showtimes []dto.ShowtimeDetail
+
+	for rows.Next() {
+		var s dto.ShowtimeDetail
+		err := rows.Scan(
+			&s.ShowtimeID,
+			&s.ShowDate,
+			&s.ShowTime,
+			&s.Price,
+			&s.LocationName,
+			&s.CinemaID,
+			&s.CinemaName,
+			&s.CinemaLogo,
+			&s.MoviePoster,
+		)
+		if err != nil {
+			return nil, err
+		}
+		showtimes = append(showtimes, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return showtimes, nil
 }
 
 func (r *MovieRepository) GetAllLocations(ctx context.Context) ([]model.Location, error) {

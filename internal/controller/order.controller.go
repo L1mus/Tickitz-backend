@@ -23,17 +23,19 @@ func NewOrderController(orderService *service.OrderService) *OrderController {
 	}
 }
 
-// @Summary		Get Seats
-// @Description	Get seats data
+// GetSeats
+// @Summary      Get Cinema Seats Layout
+// @Description  Retrieve the seating plan and availability status (Available/Sold) for a specific showtime.
 // @Tags         Orders
 // @Security     ApiKeyAuth
 // @Accept       json
 // @Produce      json
-// @Param        showtime_id  query     int     true  "ID showtime"
-// @Success		200 {object} dto.SeatPageResponse
-// @Failure 	400 {object} dto.ResponseError "bad request"
-// @Failure 	500 {object} dto.ResponseError "internal Server Error"
-// @Router		/order/seats [get]
+// @Param        showtime_id  query     int  true  "Showtime Identifier ID"
+// @Success      200          {object}  dto.SeatPageResponse "Successfully retrieved seating layout data"
+// @Failure      400          {object}  dto.ResponseError "Bad Request - Invalid query parameter"
+// @Failure      401          {object}  dto.ResponseError "Unauthorized - Valid authentication token required"
+// @Failure      500          {object}  dto.ResponseError "Internal Server Error"
+// @Router       /order/seats [get]
 func (c *OrderController) GetSeats(ctx *gin.Context) {
 	_, exist := ctx.Get("claims")
 	if !exist {
@@ -47,24 +49,26 @@ func (c *OrderController) GetSeats(ctx *gin.Context) {
 	}
 	res, err := c.orderService.GetSeats(ctx.Request.Context(), payload.ShowtimeId)
 	if err != nil {
-		response.Error(ctx, http.StatusInternalServerError, "internal server error")
+		response.Error(ctx, http.StatusInternalServerError, err.Error())
+		return
 	}
 	response.Success(ctx, http.StatusOK, "get all information Success", res)
 }
 
-// @Summary		Create Boking
-// @Description	Create Booking seat on cinema
+// CreateBooking
+// @Summary      Reserve Seats and Create Booking
+// @Description  Create a new ticket reservation for selected cinema seats.
 // @Tags         Orders
 // @Security     ApiKeyAuth
 // @Accept       json
 // @Produce      json
-// @Param        body         body      dto.CreateBookingRequest  true  "Payload data seats and tickets"
-// @Success		200 {object} dto.CreateBookingResponse
-// @Failure 	400 {object} dto.ResponseError "bad request"
-// @Failure 	401 {object} dto.ResponseError "unauthorize"
-// @Failure 	406 {object} dto.ResponseError "seats is required" "quantity is not the same as the number of seats ordered" "seat already taken"
-// @Failure 	500 {object} dto.ResponseError "internal Server Error"
-// @Router		/order/booking [post]
+// @Param        body         body      dto.CreateBookingRequest  true  "Payload containing showtime ID and selected seat IDs"
+// @Success      201          {object}  dto.CreateBookingResponse "Booking successfully created"
+// @Failure      400          {object}  dto.ResponseError "Bad Request - Invalid JSON request payload"
+// @Failure      401          {object}  dto.ResponseError "Unauthorized - Authentication required"
+// @Failure      406          {object}  dto.ResponseError "Not Acceptable - Selected seats are already sold or unavailable"
+// @Failure      500          {object}  dto.ResponseError "Internal Server Error"
+// @Router       /order/booking [post]
 func (c *OrderController) CreateBooking(ctx *gin.Context) {
 	token, exist := ctx.Get("claims")
 	if !exist {

@@ -33,16 +33,17 @@ func NewTransactionController(transactionService *service.TransactionService) *T
 
 // GetPaymentInformation
 // @Summary      Get Payment Page Information
-// @Description  Retrieve payment summary information (ticket data, total price, user data) along with payment method options..
+// @Description  Retrieve checkout summary details (ticket quantity, seats, total price, user profile) and available payment options.
 // @Tags         Transactions
 // @Security     ApiKeyAuth
 // @Accept       json
 // @Produce      json
-// @Param        booking_id   query     int     true  "ID Booking ticket"
-// @Success      200          {object}  dto.PaymentPageResponse "Success get information payment" | "booking data not found" | "user is not the same as the user who made the booking
-// @Failure      401          {object}  dto.ResponseError "Unauthorized"
+// @Param        id           path      int     true  "Booking ID"
+// @Success      200          {object}  dto.PaymentPageResponse "Successfully retrieved payment information summary"
+// @Failure      401          {object}  dto.ResponseError "Unauthorized - Login session expired or token invalid"
+// @Failure      404          {object}  dto.ResponseError "Not Found - Booking record not found or does not belong to user"
 // @Failure      500          {object}  dto.ResponseError "Internal Server Error"
-// @Router       /transactions/payment [get]
+// @Router       /transactions/payment/{id} [get]
 func (c TransactionController) GetPaymentInformation(ctx *gin.Context) {
 	token, exist := ctx.Get("claims")
 	if !exist {
@@ -65,17 +66,18 @@ func (c TransactionController) GetPaymentInformation(ctx *gin.Context) {
 	response.Success(ctx, http.StatusOK, "Success get information payment", res)
 }
 
-// SubmitPayment godoc
+// SubmitPayment
 // @Summary      Submit Selected Payment Method
+// @Description  Process the chosen payment method to initiate a transaction and generate payment details (e.g., Virtual Account).
 // @Tags         Transactions
 // @Security     ApiKeyAuth
 // @Accept       json
 // @Produce      json
-// @Param        body         body      dto.SubmitPaymentRequest  true  "Payload booking ID and payment method ID"
-// @Success      200          {object}  dto.TransactionModalResponse "Submit payment success"
-// @Failure      400          {object}  dto.ResponseError "bad request"
+// @Param        body         body      dto.SubmitPaymentRequest  true  "Payload containing booking ID and selected payment method ID"
+// @Success      200          {object}  dto.TransactionModalResponse "Payment method submitted successfully"
+// @Failure      400          {object}  dto.ResponseError "Bad Request - Missing or invalid JSON body parameters"
 // @Failure      401          {object}  dto.ResponseError "Unauthorized"
-// @Failure      403          {object}  dto.ResponseError "forbidden, booking does not belong to user"
+// @Failure      403          {object}  dto.ResponseError "Forbidden - Access denied, this booking does not belong to the authenticated user"
 // @Failure      500          {object}  dto.ResponseError "Internal Server Error"
 // @Router       /transactions/submit [post]
 func (c *TransactionController) SubmitPayment(ctx *gin.Context) {
@@ -101,16 +103,17 @@ func (c *TransactionController) SubmitPayment(ctx *gin.Context) {
 }
 
 // ConfirmPayment
-// @Summary      Confirm Ticket Payment
-// @Description  Confirm ticket payment (payment simulation complete).
+// @Summary      Simulate/Confirm Payment Complete
+// @Description  Verify and process transaction clearance (simulates payment settlement).
 // @Tags         Transactions
 // @Security     ApiKeyAuth
 // @Accept       json
 // @Produce      json
-// @Param        body         body      map[string]int  true  "example: {'transaction_id': 1, 'booking_id': 1}"
-// @Success      200          {object}  dto.TicketResultResponse "Payment confirmed successfully"
-// @Failure      400          {object}  dto.ResponseError "bad request"
+// @Param        body         body      dto.ConfirmPaymentRequest  true  "Payload containing transaction ID and booking ID to be confirmed"
+// @Success      200          {object}  dto.TicketResultResponse "Payment settlement verified and confirmed successfully"
+// @Failure      400          {object}  dto.ResponseError "Bad Request"
 // @Failure      401          {object}  dto.ResponseError "Unauthorized"
+// @Failure      406          {object}  dto.ResponseError "Not Acceptable - The transaction has already been paid"
 // @Failure      500          {object}  dto.ResponseError "Internal Server Error"
 // @Router       /transactions/confirm [post]
 func (c *TransactionController) ConfirmPayment(ctx *gin.Context) {
@@ -138,17 +141,17 @@ func (c *TransactionController) ConfirmPayment(ctx *gin.Context) {
 }
 
 // GetResultTicket
-// @Summary      Get Digital Ticket Result
-// @Description  Retrieve final invoice data for digital tickets after successful payment.
+// @Summary      Get Digital Ticket Invoice
+// @Description  Fetch the finalized digital ticket receipt details after a successful transaction payment.
 // @Tags         Transactions
 // @Security     ApiKeyAuth
 // @Accept       json
 // @Produce      json
-// @Param        transaction_id  query   int     true  "ID Transaksi"
-// @Success      200          {object}  dto.TicketResultResponse "Success get information ticket"
-// @Failure      404          {object}  dto.ResponseError "Ticket not found"
-// @Failure      500          {object}  dto.ResponseError "internal server error"
-// @Router       /transactions/result [get]
+// @Param        id           path      int     true  "Transaction ID"
+// @Success      200          {object}  dto.TicketResultResponse "Successfully retrieved final digital ticket information"
+// @Failure      401          {object}  dto.ResponseError "Unauthorized"
+// @Failure      500          {object}  dto.ResponseError "Internal Server Error"
+// @Router       /transactions/result/{id} [get]
 func (c *TransactionController) GetResultTicket(ctx *gin.Context) {
 	_, exist := ctx.Get("claims")
 	if !exist {
@@ -166,15 +169,15 @@ func (c *TransactionController) GetResultTicket(ctx *gin.Context) {
 }
 
 // GetQrCodeImage
-// @Summary      Get QR Code Image PNG
-// @Description  Generates a PNG format QR Code banner image based on the transaction ID for studio entry scanning needs..
+// @Summary      Generate Ticket QR Code Image
+// @Description  Generates and serves a raw binary PNG QR code image linked to the transaction for entry scanning verification.
 // @Tags         Transactions
 // @Security     ApiKeyAuth
 // @Produce      image/png
-// @Param        transaction_id  query   int     true  "ID Transaction"
-// @Success      200          {file}    binary "File Image QR Code PNG"
-// @Failure      500          {object}  dto.ResponseError "failed to generate QR Code"
-// @Router       /transactions/qr [get]
+// @Param        id           path      int     true  "Transaction ID"
+// @Success      200          {file}    binary  "Returns raw binary PNG image of the QR Code"
+// @Failure      500          {object}  dto.ResponseError "Internal Server Error - Failed to generate QR code image output"
+// @Router       /transactions/qr/{id} [get]
 func (c *TransactionController) GetQrCodeImage(ctx *gin.Context) {
 	transactionIDString := ctx.Param("id")
 	transactionId, _ := strconv.Atoi(transactionIDString)
@@ -193,13 +196,14 @@ func (c *TransactionController) GetQrCodeImage(ctx *gin.Context) {
 }
 
 // TryCheckOutDoku
-// @Summary      Simulate DOKU Checkout
-// @Description  Triggers an HTTP Request hit for invoice creation directly to DOKU's core system sandbox API.
+// @Summary      Simulate DOKU Sandbox Checkout Invoice
+// @Description  Triggers a direct backend-to-backend API request to DOKU Core Sandbox System to simulate a payment invoice creation.
 // @Tags         DOKU Integration
 // @Security     ApiKeyAuth
 // @Accept       json
 // @Produce      json
-// @Success      200          {object}  map[string]interface{} "Response success from Core System DOKU"
+// @Success      200          {object}  map[string]interface{} "Successfully received simulated checkout payload from DOKU Core"
+// @Failure      500          {object}  string "Internal Server Error - Failed communicating with external payment gateway API"
 // @Router       /transactions/checkout [post]
 func (c *TransactionController) TryCheckOutDoku(ctx *gin.Context) {
 	{
@@ -248,13 +252,14 @@ func (c *TransactionController) TryCheckOutDoku(ctx *gin.Context) {
 }
 
 // TryCallback
-// @Summary      DOKU Webhook Notification Listener
-// @Description  An automated endpoint listener that receives callbacks/notifications of transaction status updates from DOKU.
+// @Summary      DOKU Webhook Notification Handler Listener
+// @Description  Automated HTTP callback listener endpoint designed to receive status notification updates directly pushed by DOKU gateway systems.
 // @Tags         DOKU Integration
 // @Accept       json
 // @Produce      json
-// @Param        body         body      map[string]interface{}  true  "Data payload from DOKU"
-// @Success      200          {object}  map[string]interface{} "{'status': 'SUCCESS'}"
+// @Param        body         body      map[string]interface{}  true  "Raw payload notification structure sent from DOKU"
+// @Success      200          {object}  map[string]interface{} "Returns status verification token acknowledgement back to DOKU"
+// @Failure      400          {object}  map[string]interface{} "Bad Request - Invalid payload structure"
 // @Router       /transactions/doku-callback [post]
 func (c *TransactionController) TryCallback(ctx *gin.Context) {
 	// DOKU akan mengirimkan data hasil transaksi ke sini

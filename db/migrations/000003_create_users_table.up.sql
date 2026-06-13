@@ -10,6 +10,7 @@ CREATE TABLE users
     location_id INT,
     isActive    BOOLEAN             NOT NULL DEFAULT FALSE,
     role        role_user           NOT NULL DEFAULT 'user',
+    point       INT DEFAULT 0,
     created_at  TIMESTAMP                    DEFAULT NOW(),
     updated_at  TIMESTAMP,
 

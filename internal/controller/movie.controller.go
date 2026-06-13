@@ -146,6 +146,30 @@ func (c *MovieController) GetShowtimeFilter(ctx *gin.Context) {
 	response.Success(ctx, http.StatusOK, "Get data success", res)
 }
 
+// @Summary      Get Movie Showtime Details
+// @Description  Fetch schedule and cinema details by movie ID
+// @Tags         movie
+// @Produce      json
+// @Param        id   path      int  true  "Movie ID"
+// @Success      200  {object}  []dto.ShowtimeDetailResponse "Success"
+// @Router       /movies/{id}/showtimes [get]
+func (c *MovieController) GetShowtimes(ctx *gin.Context) {
+	movieIDParam := ctx.Param("id")
+	movieID, err := strconv.Atoi(movieIDParam)
+	if err != nil {
+		response.Error(ctx, http.StatusBadRequest, apperror.MovieNotFound.Error())
+		return
+	}
+
+	showtimes, err := c.movieService.GetMovieShowtimes(ctx.Request.Context(), movieID)
+	if err != nil {
+		response.Error(ctx, http.StatusInternalServerError, apperror.ErrInternalServer.Error())
+		return
+	}
+
+	response.Success(ctx, http.StatusOK, "Get data success", showtimes)
+}
+
 // @Summary      Get All Locations
 // @Description  fetch all locations data for dropdown
 // @Tags         Locations

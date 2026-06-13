@@ -71,7 +71,7 @@ func (c *UserController) GetUserProfile(ctx *gin.Context) {
 
 // @Summary		Update User Profile
 // @Description	Update user data profile
-// @Tags		Profile
+// @Tags		Users
 // @Accept		multipart/form-data
 // @Produce		json
 // @Security	ApiKeyAuth

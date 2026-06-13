@@ -43,8 +43,8 @@ type MovieDetailResponse struct {
 	Synopsis    string     `json:"synopsis" example:"Seorang astronot nekat melintasi lubang cacing demi menyelamatkan umat manusia dari kehancuran bumi yang semakin tak layak huni. Perjalanan melintasi ruang dan waktu membawa konsekuensi yang tak pernah ia bayangkan sebelumnya."`
 	Category    string     `json:"category" example:"13+"`
 	Directors   string     `json:"directors" example:"Christopher Nolan"`
-	Genres      []GenreDTO `json:"genres"`
-	Casts       []CastDTO  `json:"casts"`
+	Genres      []GenreDTO `json:"genres" `
+	Casts       []CastDTO  `json:"casts" `
 }
 
 type ShowtimeFilterResponse struct {
@@ -52,22 +52,22 @@ type ShowtimeFilterResponse struct {
 	Locations []LocationDTO     `json:"locations"`
 }
 type SeatDTO struct {
-	SeatID     int    `json:"seat_id"`
-	Row        string `json:"row"`
-	SeatNumber int    `json:"seat_number"`
-	SeatType   string `json:"seat_type"`
-	SeatStatus string `json:"seat_status" binding:"required,oneof=available sold"`
+	SeatID     int    `json:"seat_id" example:"145"`
+	Row        string `json:"row" example:"C"`
+	SeatNumber int    `json:"seat_number" example:"7"`
+	SeatType   string `json:"seat_type" example:"Regular"`
+	SeatStatus string `json:"seat_status" example:"available" binding:"required,oneof=available sold"`
 }
 
 type SummaryMovieDTO struct {
-	MovieTitle  string    `json:"movie_title"`
-	MoviePoster string    `json:"movie_poster"`
-	Category    string    `json:"category"`
-	CinemaName  string    `json:"cinema_name"`
-	CinemaLogo  string    `json:"cinema_logo"`
-	ShowDate    time.Time `json:"show_date"`
-	ShowTime    string    `json:"show_time"`
-	TicketPrice int       `json:"ticket_price"`
+	MovieTitle  string    `json:"movie_title" example:"Interstellar Reborn"`
+	MoviePoster string    `json:"movie_poster" example:"https://storage.tickitz.id/posters/interstellar_reborn.jpg"`
+	Category    string    `json:"category" example:"13+"`
+	CinemaName  string    `json:"cinema_name" example:"CGV Grand Indonesia"`
+	CinemaLogo  string    `json:"cinema_logo" example:"https://storage.tickitz.id/cinema/cgv.png"`
+	ShowDate    time.Time `json:"show_date" example:"2026-06-15T00:00:00Z"`
+	ShowTime    string    `json:"show_time" example:"18:30"`
+	TicketPrice int       `json:"ticket_price" example:"50000"`
 }
 type SeatPageResponse struct {
 	Summary SummaryMovieDTO `json:"summary"`
@@ -75,45 +75,44 @@ type SeatPageResponse struct {
 }
 
 type CreateBookingResponse struct {
-	BookingID int `json:"booking_id"`
+	BookingID int `json:"booking_id" example:"1024"`
 }
 type PaymentMethodDTO struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Logo string `json:"logo"`
+	ID   int    `json:"id" example:"2"`
+	Name string `json:"name" example:"DANA"`
+	Logo string `json:"logo" example:"/img/pm/DANA.png"`
 }
 type PaymentPageResponse struct {
-	BookingID      int                `json:"booking_id"`
-	MovieTitle     string             `json:"movie_title"`
-	CinemaName     string             `json:"cinema_name"`
-	ShowDate       time.Time          `json:"show_date"`
-	ShowTime       string             `json:"show_time"`
-	Quantity       int                `json:"quantity"`
-	SeatLabels     string             `json:"seat_labels"`
-	TotalPrice     int                `json:"total_price"`
-	FullName       string             `json:"full_name"`
-	Email          string             `json:"email"`
-	Phone          string             `json:"phone"`
+	BookingID      int                `json:"booking_id" example:"1024"`
+	MovieTitle     string             `json:"movie_title" example:"Interstellar Reborn"`
+	CinemaName     string             `json:"cinema_name" example:"CGV Grand Indonesia"`
+	ShowDate       time.Time          `json:"show_date" example:"2026-06-15T00:00:00Z"`
+	ShowTime       string             `json:"show_time" example:"18:30"`
+	Quantity       int                `json:"quantity" example:"2"`
+	SeatLabels     string             `json:"seat_labels" example:"C7, C8"`
+	TotalPrice     int                `json:"total_price" example:"100000"`
+	FullName       string             `json:"full_name" example:"Ali Mustadji"`
+	Email          string             `json:"email" example:"ali.mustadji@example.com"`
+	Phone          string             `json:"phone" example:"081234567890"`
 	PaymentMethods []PaymentMethodDTO `json:"payment_methods"`
 }
-
 type TransactionModalResponse struct {
-	TransactionID   int       `json:"transaction_id"`
-	VirtualRek      int64     `json:"virtual_rek"`
-	TotalPrice      int       `json:"total_price"`
-	Status          string    `json:"status"`
-	PaymentDeadline time.Time `json:"payment_deadline"`
+	TransactionID   int       `json:"transaction_id" example:"5001"`
+	VirtualRek      int64     `json:"virtual_rek" example:"8856001234567890"`
+	TotalPrice      int       `json:"total_price" example:"100000"`
+	Status          string    `json:"status" example:"PENDING"`
+	PaymentDeadline time.Time `json:"payment_deadline" example:"2026-06-13T19:47:00Z"`
 }
 type TicketResultResponse struct {
-	QRCode        string    `json:"qr_code"`
-	TotalPrice    int       `json:"total_price"`
-	PaymentStatus string    `json:"payment_status"`
-	MovieTitle    string    `json:"movie_title"`
-	Category      string    `json:"category"`
-	ShowDate      time.Time `json:"show_date"`
-	ShowTime      string    `json:"show_time"`
-	TicketCount   int       `json:"ticket_count"`
-	SeatLabels    string    `json:"seat_labels"`
+	QRCode        string    `json:"qr_code" example:"TICKITZ-TX-5001-SECURE-STRING"`
+	TotalPrice    int       `json:"total_price" example:"100000"`
+	PaymentStatus string    `json:"payment_status" example:"PAID"`
+	MovieTitle    string    `json:"movie_title" example:"Interstellar Reborn"`
+	Category      string    `json:"category" example:"13+"`
+	ShowDate      time.Time `json:"show_date" example:"2026-06-15T00:00:00Z"`
+	ShowTime      string    `json:"show_time" example:"18:30"`
+	TicketCount   int       `json:"ticket_count" example:"2"`
+	SeatLabels    string    `json:"seat_labels" example:"C7, C8"`
 }
 
 type MovieResponse struct {
@@ -142,7 +141,26 @@ type MoviePaginationResponse struct {
 	Data    []MovieResponse `json:"data"`
 }
 
-type ConfirmPaymentRequest struct {
-	TransactionID int `json:"transaction_id" binding:"required"`
-	BookingID     int `json:"booking_id" binding:"required"`
+type ShowtimeDetail struct {
+	ShowtimeID   int       `json:"showtime_id"`
+	ShowDate     time.Time `json:"show_date"`
+	ShowTime     string    `json:"show_time"`
+	Price        int       `json:"price"`
+	LocationName string    `json:"location_name"`
+	CinemaID     int       `json:"cinema_id"`
+	CinemaName   string    `json:"cinema_name"`
+	CinemaLogo   string    `json:"cinema_logo"`
+	MoviePoster  string    `json:"movie_poster"`
+}
+
+type ShowtimeDetailResponse struct {
+	ShowtimeID  int    `json:"showtime_id"`
+	Date        string `json:"date"`
+	Time        string `json:"time"`
+	Price       int    `json:"price"`
+	City        string `json:"city"`
+	CinemaID    int    `json:"cinema_id"`
+	CinemaName  string `json:"cinema_name"`
+	CinemaLogo  string `json:"cinema_logo"`
+	MoviePoster string `json:"movie_poster"`
 }

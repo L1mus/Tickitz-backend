@@ -50,7 +50,7 @@ func (s *OrderService) GetSeats(ctx context.Context, showtimeID int) (dto.SeatPa
 		return dto.SeatPageResponse{}, err
 	}
 
-	var seats []dto.SeatDTO
+	seats := make([]dto.SeatDTO, 0)
 	for _, seat := range data {
 		seat := dto.SeatDTO{
 			SeatID:     seat.SeatID,

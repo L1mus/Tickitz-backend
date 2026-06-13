@@ -55,6 +55,38 @@ func (c *AdminMovieController) AdminGetMovies(ctx *gin.Context) {
 	response.Success(ctx, http.StatusOK, "Get Movie List Success", res)
 }
 
+// @Summary      Get Movie Detail
+// @Description  Mengambil data lengkap satu film berdasarkan ID, termasuk semua relasi (genre, cast, director, location, dates, times). Digunakan untuk mengisi form edit movie.
+// @Tags         Admin
+// @Accept       json
+// @Produce      json
+// @Param        id   path     int  true  "ID Film"
+// @Success      200  {object} dto.AdminResponseSuccess{data=dto.AdminMovieDetailResponse} "Sukses mengambil detail film"
+// @Failure      400  {object} dto.AdminResponseError "ID tidak valid"
+// @Failure      404  {object} dto.AdminResponseError "Film tidak ditemukan"
+// @Failure      500  {object} dto.AdminResponseError "Internal server error"
+// @Router       /admin/movies/{id} [get]
+func (c *AdminMovieController) AdminGetMovieDetail(ctx *gin.Context) {
+	idStr := ctx.Param("id")
+	movieID, err := strconv.Atoi(idStr)
+	if err != nil {
+		response.Error(ctx, http.StatusBadRequest, "Invalid movie ID")
+		return
+	}
+
+	detail, err := c.movieService.AdminGetMovieDetail(ctx.Request.Context(), movieID)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			response.Error(ctx, http.StatusNotFound, err.Error())
+			return
+		}
+		response.Error(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.Success(ctx, http.StatusOK, "Get Movie Detail Success", detail)
+}
+
 // @Summary      Add New Movie
 // @Description  Menambahkan data film baru beserta file poster dan otomatisasi jadwal tayang
 // @Tags         Admin
@@ -105,7 +137,7 @@ func (c *AdminMovieController) AdminCreateMovie(ctx *gin.Context) {
 	}
 
 	if !allowedExtensions[extension] {
-		response.Error(ctx, http.StatusBadRequest, "Invalid image format. Only .jpg, .jpeg,.png and webp are allowed")
+		response.Error(ctx, http.StatusBadRequest, "Invalid image format. Only .jpg, .jpeg,.png and .webp are allowed")
 		return
 	}
 
@@ -175,7 +207,7 @@ func (c *AdminMovieController) AdminUpdateMovie(ctx *gin.Context) {
 		}
 
 		extension := strings.ToLower(filepath.Ext(req.Poster.Filename))
-		allowedExtensions := map[string]bool{".jpg": true, ".jpeg": true, ".png": true}
+		allowedExtensions := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true}
 
 		if !allowedExtensions[extension] {
 			response.Error(ctx, http.StatusBadRequest, "Invalid image format")

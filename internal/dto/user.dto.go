@@ -55,17 +55,17 @@ type OrderHistoryRes struct {
 }
 
 type DetailInformationRes struct {
-	BookingId      int      `json:"booking_id"`
-	StatusTicket   string   `json:"ticket_status"`
-	StatusPaid     string   `json:"payment_status"`
-	TotalPrice     int      `json:"total_price"`
-	VirtualRek     int      `json:"virtua_account,omitempty"`
-	DueDateMessage string   `json:"due_date_message,omitempty"`
-	QrCode         string   `json:"qr_code,omitempty"`
-	MovieTitle     string   `json:"movie_title,omitempty"`
-	Category       string   `json:"category,omitempty"`
-	ShowtimeTime   string   `json:"showtime_time,omitempty"`
-	ShowtimeDate   string   `json:"showtime_date,omitempty"`
-	Quantity       int      `json:"quantity,omitempty"`
-	Seats          []string `json:"seats,omitempty"`
+	BookingId    int      `json:"booking_id"`
+	StatusTicket string   `json:"ticket_status"`
+	StatusPaid   string   `json:"payment_status"`
+	TotalPrice   int      `json:"total_price"`
+	VirtualRek   int      `json:"virtua_account,omitempty"`
+	DueDate      string   `json:"due_date,omitempty"`
+	QrCode       string   `json:"qr_code,omitempty"`
+	MovieTitle   string   `json:"movie_title,omitempty"`
+	Category     string   `json:"category,omitempty"`
+	ShowtimeTime string   `json:"showtime_time,omitempty"`
+	ShowtimeDate string   `json:"showtime_date,omitempty"`
+	Quantity     int      `json:"quantity,omitempty"`
+	Seats        []string `json:"seats,omitempty"`
 }

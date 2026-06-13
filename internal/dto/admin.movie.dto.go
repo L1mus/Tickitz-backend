@@ -30,6 +30,21 @@ type AdminMovieListResponse struct {
 	Limit     int                 `json:"limit"`
 }
 
+type AdminMovieDetailResponse struct {
+	ID          int        `json:"id"`
+	Title       string     `json:"title"`
+	Duration    string     `json:"duration"`
+	Poster      string     `json:"poster"`
+	ReleaseDate *time.Time `json:"release_date"`
+	Synopsis    string     `json:"synopsis"`
+	GenreIDs    []int      `json:"genre_ids"`
+	CastIDs     []int      `json:"cast_ids"`
+	DirectorIDs []int      `json:"director_ids"`
+	LocationIDs []int      `json:"location_ids"`
+	Dates       []string   `json:"dates"`
+	Times       []string   `json:"times"`
+}
+
 type AdminAddMovieRequest struct {
 	Title          string                `form:"title" binding:"required"`
 	Poster         *multipart.FileHeader `form:"poster" binding:"required"`
@@ -72,14 +87,12 @@ type MovieOptionsResponse struct {
 	Locations []OptionItem `json:"locations"`
 }
 
-// AdminResponseSuccess adalah struktur dasar untuk merespon request yang berhasil di Swagger
 type AdminResponseSuccess struct {
 	Status  string      `json:"status" example:"success"`
 	Message string      `json:"message" example:"Operation successful"`
 	Data    interface{} `json:"data"`
 }
 
-// AdminResponseError adalah struktur dasar untuk merespon request yang gagal di Swagger
 type AdminResponseError struct {
 	Status  string `json:"status" example:"error"`
 	Message string `json:"message" example:"Error message detail"`

@@ -139,6 +139,30 @@ func (s *MovieService) GetAllMovies(ctx context.Context, search, genre, status, 
 	return responseList, nil
 }
 
+func (s *MovieService) GetMovieShowtimes(ctx context.Context, movieID int) ([]dto.ShowtimeDetailResponse, error) {
+	repoDetails, err := s.movieRepo.GetShowtimeDetailsByMovieID(ctx, movieID)
+	if err != nil {
+		return nil, err
+	}
+
+	var response []dto.ShowtimeDetailResponse
+	for _, item := range repoDetails {
+		response = append(response, dto.ShowtimeDetailResponse{
+			ShowtimeID:  item.ShowtimeID,
+			Date:        item.ShowDate.Format("2006-01-02"),
+			Time:        item.ShowTime,
+			Price:       item.Price,
+			City:        item.LocationName,
+			CinemaID:    item.CinemaID,
+			CinemaName:  item.CinemaName,
+			CinemaLogo:  item.CinemaLogo,
+			MoviePoster: item.MoviePoster,
+		})
+	}
+
+	return response, nil
+}
+
 func (s *MovieService) GetAllLocations(ctx context.Context) ([]dto.LocationDTO, error) {
 	locations, err := s.movieRepo.GetAllLocations(ctx)
 	if err != nil {
