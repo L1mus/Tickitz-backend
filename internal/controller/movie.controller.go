@@ -40,15 +40,16 @@ func (c *MovieController) GetAll(ctx *gin.Context) {
 	statusParam := ctx.Query("status")
 	limitParam := ctx.Query("limit")
 	pageParam := ctx.DefaultQuery("page", "1")
+	locationParam := ctx.Query("location_id")
 
-	movies, err := c.movieService.GetAllMovies(ctx.Request.Context(), searchParam, genreParam, statusParam, limitParam, pageParam)
+	movies, err := c.movieService.GetAllMovies(ctx.Request.Context(), searchParam, genreParam, statusParam, limitParam, pageParam, locationParam)
 	if err != nil {
 		fmt.Println("LOG ERROR 500:", err.Error())
 		response.Error(ctx, http.StatusInternalServerError, apperror.ErrInternalServer.Error())
 		return
 	}
 
-	totalData, _ := c.movieService.GetTotalCount(ctx.Request.Context(), searchParam, genreParam, statusParam)
+	totalData, _ := c.movieService.GetTotalCount(ctx.Request.Context(), searchParam, genreParam, statusParam, locationParam)
 
 	pageInt, _ := strconv.Atoi(pageParam)
 	limitInt := 12
@@ -167,4 +168,22 @@ func (c *MovieController) GetShowtimes(ctx *gin.Context) {
 	}
 
 	response.Success(ctx, http.StatusOK, "Get data success", showtimes)
+}
+
+// @Summary      Get All Locations
+// @Description  fetch all locations data for dropdown
+// @Tags         Locations
+// @Produce      json
+// @Success      200 {array} dto.LocationDTO
+// @Failure      500 {object} dto.ResponseError "Internal Server Error"
+// @Router       /movies/locations [get]
+func (c *MovieController) GetAllLocations(ctx *gin.Context) {
+	locations, err := c.movieService.GetAllLocations(ctx.Request.Context())
+	if err != nil {
+		fmt.Println("LOG ERROR 500 GetAllLocations:", err.Error())
+		response.Error(ctx, http.StatusInternalServerError, apperror.ErrInternalServer.Error())
+		return
+	}
+
+	response.Success(ctx, http.StatusOK, "Get all locations success", locations)
 }

@@ -17,6 +17,7 @@ func MovieRouter(router *gin.RouterGroup, db *pgxpool.Pool, rdb *redis.Client) {
 	controllerMovie := controller.NewMovieController(serviceMovie)
 
 	movieRouter.GET("", controllerMovie.GetAll)
+	movieRouter.GET("/locations", controllerMovie.GetAllLocations)
 	movieRouter.GET("/:id", controllerMovie.GetMovieDetail)
 	// movieRouter.GET("/:id/showtime", controllerMovie.GetShowtimeFilter)
 	movieRouter.GET("/:id/showtimes", controllerMovie.GetShowtimes)
