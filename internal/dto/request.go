@@ -21,3 +21,8 @@ type SubmitPaymentRequest struct {
 type OrderSeatRequest struct {
 	ShowtimeId int `form:"showtime_id" binding:"required" example:"1"`
 }
+
+type ConfirmPaymentRequest struct {
+	TransactionID int `json:"transaction_id" example:"5001" binding:"required"`
+	BookingID     int `json:"booking_id" example:"1024" binding:"required"`
+}
