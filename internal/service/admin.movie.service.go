@@ -130,3 +130,8 @@ func (s *AdminMovieService) AdminUpdateMovie(ctx context.Context, movieID int, r
 
 	return s.movieRepo.AdminUpdateMovieFull(ctx, movieID, existingMovie, req)
 }
+
+// soft delete
+func (s *AdminMovieService) SoftDeleteMovie(ctx context.Context, id int) error {
+	return s.movieRepo.SoftDeleteMovie(ctx, id)
+}
