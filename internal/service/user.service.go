@@ -62,6 +62,11 @@ func (s *UserService) GetProfile(ctx context.Context, userID int) (dto.UserProfi
 
 	fullName := strings.TrimSpace(*profile.First_Name + " " + *profile.Last_Name)
 
+	locationName := ""
+	if profile.Location != nil {
+		locationName = profile.Location.Name
+	}
+
 	resp = dto.UserProfileResponse{
 		Id:        profile.ID,
 		FirstName: profile.First_Name,
@@ -71,7 +76,7 @@ func (s *UserService) GetProfile(ctx context.Context, userID int) (dto.UserProfi
 		Phone:     profile.Phone,
 		Photo:     profile.Photo,
 		Point:     &profile.Point,
-		Location:  profile.Location.Name,
+		Location:  locationName,
 	}
 	_ = cache.SaveToCache(ctx, s.rdb, cacheKey, resp, userProfileTTL)
 
